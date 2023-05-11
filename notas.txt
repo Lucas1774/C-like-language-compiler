@@ -1,0 +1,29 @@
+En la sesión presencial obligatoria, el tutor comprobará que el alumno ha realizado:
+- Análisis semántico
+o desarrollo tabla de tipos
+o desarrollo tabla de símbolos
+o comprobación de la unicidad de declaraciones y definiciones
+o comprobación de tipos
+o comprobación de paso de parámetros
+- Código intermedio
+o se ha comenzado esta fase
+
+
+Implementar una clase para cada no terminal de la gramática que requiera atributos en compiler.syntax. Asociar terminales a clases en la declaración de terminales en paraser.cup i.e non terminal ConstanteLiteral constanteliteral; Inicialmente vacías. Para que Cup reconozca estas clases asegúrese de que en la sección de importaciones existe una clausula import del estilo import compiler.syntax.nonTerminal.
+
+Ejemplo acción semántica 
+X ::= A B {: <<código java aquí>>  :} C D ; 
+
+Utilizar cuptest para comprobar cambios
+
+Añadir acciones semánticas en parser.cup
+
+Propagación de atributos -> introducir código en las reglas de la forma {:
+	ConstanteLiteral constante = new ConstanteLiteral ("", "tipoEntero");
+RESULT = constante
+:}
+
+Para hacer uso de estos atributos, si por ejemplo una constante literal es un tipo de expresión, en la regla de definición de expresión: constanteLiteral:c {:
+Expresion e = new Expresion (c.getTipo()):
+RESULT = e;
+:}
