@@ -8,13 +8,9 @@ o comprobación de paso de parámetros
 - Código intermedio
 o se ha comenzado esta fase
 
+Crear tablas de tipos con scope()
 
-Implementar una clase para cada no terminal de la gramática que requiera atributos en compiler.syntax. Asociar terminales a clases en la declaración de terminales en paraser.cup i.e non terminal ConstanteLiteral constanteliteral; Inicialmente vacías. Para que Cup reconozca estas clases asegúrese de que en la sección de importaciones existe una clausula import del estilo import compiler.syntax.nonTerminal.
-
-Ejemplo acción semántica 
-X ::= A B {: <<código java aquí>>  :} C D ; 
-
-Utilizar cuptest para comprobar cambios
+Implementar tipos en compiler.semantic.type
 
 Añadir acciones semánticas en parser.cup
 
