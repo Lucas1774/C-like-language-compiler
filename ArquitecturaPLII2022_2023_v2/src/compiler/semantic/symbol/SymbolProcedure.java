@@ -8,7 +8,7 @@ import es.uned.lsi.compiler.semantic.type.TypeIF;
  * Class for SymbolProcedure.
  */
 
-// TODO: Student work
+// Student work
 //       Include properties to characterize procedure calls
 
 public class SymbolProcedure

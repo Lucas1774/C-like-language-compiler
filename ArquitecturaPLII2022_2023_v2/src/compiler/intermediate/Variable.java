@@ -52,7 +52,7 @@ public class Variable
     @Override
     public final int getAddress ()
     {
-        // TODO : Student Work
+        // Student work
         return 0;
     }
 
@@ -63,7 +63,7 @@ public class Variable
     @Override
     public final boolean isGlobal ()
     {
-        // TODO : Student Work
+        // Student work
         return true;
     }
 

@@ -7,7 +7,7 @@ import es.uned.lsi.compiler.semantic.type.TypeBase;
  * Class for TypeEnum.
  */
 
-// TODO: Student work
+// Student work
 //       Include properties to characterize enumeration type
 
 public class TypeEnum
@@ -40,7 +40,7 @@ public class TypeEnum
     @Override
     public int getSize ()
     {
-        // TODO: Student work
+        // Student work
         return 1;
     }
 }

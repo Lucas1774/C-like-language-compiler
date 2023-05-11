@@ -7,7 +7,7 @@ import es.uned.lsi.compiler.semantic.type.TypeBase;
  * Class for TypeRecord.
  */
 
-// TODO: Student work
+// Student work
 //       Include properties to characterize records
 
 public class TypeRecord
@@ -49,7 +49,7 @@ public class TypeRecord
     @Override
     public int getSize ()
     {
-        // TODO: Student work
+        // Student work
         return 1;
     }
 }
