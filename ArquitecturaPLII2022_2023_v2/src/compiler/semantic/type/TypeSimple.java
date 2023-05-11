@@ -10,7 +10,7 @@ import es.uned.lsi.compiler.semantic.type.TypeBase;
  * Class for TypeSimple.
  */
 
-// TODO: Student work
+// Student work
 //       Include properties to characterize simple types
 
 public class TypeSimple

@@ -7,7 +7,7 @@ import es.uned.lsi.compiler.semantic.type.TypeBase;
  * Class for TypeProcedure.
  */
 
-// TODO: Student work
+// Student work
 //       Include properties to characterize procedure declarations
 
 public class TypeProcedure
@@ -39,7 +39,7 @@ public class TypeProcedure
     @Override
     public int getSize ()
     {
-        // TODO: Student work
+        // Student work
         return 1;
     }
 }

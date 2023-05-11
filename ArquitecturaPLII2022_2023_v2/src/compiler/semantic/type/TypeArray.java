@@ -7,7 +7,7 @@ import es.uned.lsi.compiler.semantic.type.TypeBase;
  * Class for TypeArray.
  */
 
-// TODO: Student work
+// Student work
 //       Include properties to characterize array type
 
 public class TypeArray
@@ -40,7 +40,7 @@ public class TypeArray
     @Override
     public int getSize ()
     {
-        // TODO: Student work
+        // Student work
         return 1;
     }
 }

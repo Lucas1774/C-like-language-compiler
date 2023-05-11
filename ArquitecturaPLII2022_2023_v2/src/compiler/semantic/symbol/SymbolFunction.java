@@ -7,7 +7,7 @@ import es.uned.lsi.compiler.semantic.type.TypeIF;
  * Class for SymbolFunction.
  */
 
-// TODO: Student work
+// Student work
 //       Include properties to characterize function calls
 
 public class SymbolFunction

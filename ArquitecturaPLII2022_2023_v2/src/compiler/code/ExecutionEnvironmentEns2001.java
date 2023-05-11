@@ -93,7 +93,7 @@ public class ExecutionEnvironmentEns2001
     @Override
     public final String translate (QuadrupleIF quadruple)
     {      
-        //TODO: Student work
+        //Student work
         return quadruple.toString(); 
     }
 }

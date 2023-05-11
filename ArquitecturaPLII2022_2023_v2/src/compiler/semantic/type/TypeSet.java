@@ -7,7 +7,7 @@ import es.uned.lsi.compiler.semantic.type.TypeBase;
  * Class for TypeSet.
  */
 
-// TODO: Student work
+// Student work
 //       Include properties to characterize sets
 
 public class TypeSet
@@ -40,7 +40,7 @@ public class TypeSet
     @Override
     public int getSize ()
     {
-        // TODO: Student work
+        // Student work
         return 1;
     }
 }
