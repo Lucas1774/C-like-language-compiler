@@ -1,0 +1,9 @@
+{
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "ArquitecturaPLII2022_2023_v2\\lib\\compiler-api.jar",
+        "ArquitecturaPLII2022_2023_v2\\lib\\Cup.jar",
+        "ArquitecturaPLII2022_2023_v2\\lib\\JFlex.jar"
+    ],
+    "java.project.outputPath": "ArquitecturaPLII2022_2023_v2\\classes"
+}
