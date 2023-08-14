@@ -24,25 +24,52 @@ import compiler.intermediate.*;
 import compiler.code.*;
 
 // Declaracion del codigo de usuario
-
 action code {:
-	
 	SyntaxErrorManager   syntaxErrorManager   = CompilerContext.getSyntaxErrorManager();
 	SemanticErrorManager semanticErrorManager = CompilerContext.getSemanticErrorManager ();
 	ScopeManagerIF       scopeManager         = CompilerContext.getScopeManager ();
 	FinalCodeFactoryIF   finalCodeFactory     = CompilerContext.getFinalCodeFactory ();
 
+	public SymbolIF checkIfExistsSymbolWithinOpenScopes (Token token, boolean iWantIt){
+		List<ScopeIF> scopes = scopeManager.getOpenScopes();
+		for (int i = 0; i < scopes.size(); i++){
+			ScopeIF scope = scopes.get(i);
+			if (iWantIt && !scope.getSymbolTable().containsSymbol(token.getLexema())){
+				semanticErrorManager.semanticFatalError("Linea " + token.getLine() + " Columna " + token.getColumn() + " identificador " + token.getLexema() + " no declarado");
+			} else if (!iWantIt && scope.getSymbolTable().containsSymbol(token.getLexema())){
+				semanticErrorManager.semanticFatalError("Linea " + token.getLine() + " Columna " + token.getColumn() + " identificador " + token.getLexema() + " ya declarado");
+			} else if (iWantIt && scope.getSymbolTable().containsSymbol(token.getLexema())){
+				return scope.getSymbolTable().getSymbol(token.getLexema());
+			}
+		}
+		return null;
+	}
+
+	public TypeIF checkIfExistsTypeWithinOpenScopes (Token token, boolean iWantIt){
+		List<ScopeIF> scopes = scopeManager.getOpenScopes();
+		for (int i = 0; i < scopes.size(); i++){
+			ScopeIF scope = scopes.get(i);
+			if (iWantIt && !scope.getTypeTable().containsType(token.getLexema())){
+				semanticErrorManager.semanticFatalError("Linea " + token.getLine() + " Columna " + token.getColumn() + " tipo " + token.getLexema() + " no declarado");
+			} else if (!iWantIt && scope.getTypeTable().containsType(token.getLexema())){
+				semanticErrorManager.semanticFatalError("Linea " + token.getLine() + " Columna " + token.getColumn() + " tipo " + token.getLexema() + " ya declarado");
+			} else if (iWantIt && scope.getTypeTable().containsType(token.getLexema())){
+				return scope.getTypeTable().getType(token.getLexema());
+			}
+		}
+		return null;
+	}
 :}	
 
 parser code {:
 	SyntaxErrorManager syntaxErrorManager = CompilerContext.getSyntaxErrorManager();
-	
+
 	public void syntax_error(Symbol symbol)
 	{ 
 	    Token token = (Token) symbol.value;
 	    syntaxErrorManager.syntaxError ("Error sintactico", token);	    
 	}
-		
+
 	public void unrecovered_syntax_error(java_cup.runtime.Symbol symbol)
 	{	
 	    Token token = (Token) symbol.value;
@@ -51,8 +78,6 @@ parser code {:
 :}
 
 // Declaracion de terminales
-
-
 terminal Token PLUS;
 terminal Token AUTO_INCREMENTO;
 terminal Token MULT;
@@ -90,50 +115,51 @@ terminal Token IDENTIFICADOR;
 terminal Token NUMERO;
 terminal Token STRING;
 
-
 // Declaracion de no terminales
-
-non terminal  			program;
-non terminal Axiom		axiom;
-non terminal axiom1,listadoIDs1,id1,funcion1;
-non terminal  			funcionPrincipal;
-non terminal			epsilon;
-non terminal			seccionFunciones;
-non terminal			funcion;
-non terminal			seccionParametros;
-non terminal		 	declaracionParametros;
-non terminal			parametro;
-non terminal			seccionConstantes;
-non terminal			declaracionConstante;
-non terminal			seccionTipos;
-non terminal			declaracionTipo;
-non terminal			tamTipo;
-non terminal			seccionVariables;
-non terminal 			declaracionVariable;
-non terminal			listadoIDs;
-non terminal			id;
-non terminal			expresion;
-non terminal 			accesoVector;
-non terminal			llamadaFuncion;
-non terminal			bloque;
-non terminal			listadoSentencias;
-non terminal			sentencia;
-non terminal			sentenciaIncremento;
-non terminal			sentenciaAsignacion;
-non terminal			ref;
-non terminal			sentenciaAsignacionSuma;
-non terminal			sentenciaSi;
-non terminal			sentenciaAlternativas;
-non terminal			casosAlternativa;
-non terminal			casoAlt; 
-non terminal			porDefecto;
-non terminal			sentenciaMientras;
-non terminal			sentenciaLlamadaFuncion;
-non terminal			parametros;
-non terminal			sentenciaSalida;
-non terminal			opcionesEscribe;
-non terminal			opcionesEscribeEnt;
-non terminal			sentenciaDevuelve;
+non terminal program;
+non terminal Axiom axiom;
+non terminal axiom1;
+non terminal Id1 id1;
+non terminal funcion1;
+non terminal funcionPrincipal;
+non terminal epsilon;
+non terminal seccionFunciones;
+non terminal funcion;
+non terminal ArrayList<Parametro> seccionParametros;
+non terminal ArrayList<Parametro> declaracionParametros;
+non terminal Parametro parametro;
+non terminal seccionConstantes;
+non terminal DeclaracionConstante declaracionConstante;
+non terminal seccionTipos;
+non terminal declaracionTipo;
+non terminal TamTipo tamTipo;
+non terminal seccionVariables;
+non terminal declaracionVariable;
+non terminal ArrayList<Id> listadoIDs1;
+non terminal ArrayList<Id> listadoIDs;
+non terminal Id id;
+non terminal expresion;
+non terminal accesoVector;
+non terminal llamadaFuncion;
+non terminal bloque;
+non terminal ArrayList<Sentencia> listadoSentencias;
+non terminal Sentencia sentencia;
+non terminal sentenciaIncremento;
+non terminal sentenciaAsignacion;
+non terminal ref;
+non terminal sentenciaAsignacionSuma;
+non terminal sentenciaSi;
+non terminal sentenciaAlternativas;
+non terminal casosAlternativa;
+non terminal casoAlt; 
+non terminal porDefecto;
+non terminal sentenciaMientras;
+non terminal sentenciaLlamadaFuncion;
+non terminal parametros;
+non terminal sentenciaSalida;
+non terminal opcionesEscribe;
+non terminal opcionesEscribeEnt;
+non terminal sentenciaDevuelve;
 
 // Declaracion de relaciones de precedencia
 precedence left     AND_LOGICA;
@@ -144,97 +170,250 @@ precedence left		MULT;
 precedence left		AUTO_INCREMENTO, NEGACION;
 precedence right	OPEN_BRACKET, CLOSE_BRACKET;
 precedence left 	OPEN_KEY, CLOSE_KEY;
-
-
-
-
 precedence nonassoc SINO;
 precedence nonassoc SI;
-            
 
 // Declaracion de reglas de produccion
-
-
 start with program;
-
-program ::= 
-  {: 
-        syntaxErrorManager.syntaxInfo ("Starting parsing..."); 
-   :}
-  axiom:ax
-  {:   		
-  		// No modificar esta estructura, aunque se pueden añadir más acciones semánticas
-  		
-  		//List intermediateCode = ax.getIntermediateCode ();
-  		//finalCodeFactory.create (intermediateCode);
-
-  		// En caso de no comentarse las dos sentencias anteriores se puede generar una excepcion
-  		// en las llamadas a cupTest si el compilador no está completo. Esto es debido a que 
-  		// aún no se tendrá implementada la generación de código intermedio ni final.
-  		// Para la entrega final deberán descomentarse y usarse.
-  		
-  		syntaxErrorManager.syntaxInfo ("Parsing process ended.");
-  		
-   :};
-
 
 epsilon ::= ;
 
+program ::= 
+{: 
+    syntaxErrorManager.syntaxInfo ("Starting parsing...");
+:}
+	axiom:ax
+	{:   		
+		// No modificar esta estructura, aunque se pueden añadir más acciones semánticas
+		
+		//List intermediateCode = ax.getIntermediateCode ();
+		//finalCodeFactory.create (intermediateCode);
 
-axiom ::=  seccionConstantes seccionTipos  axiom1 ;
+		// En caso de no comentarse las dos sentencias anteriores se puede generar una excepcion
+		// en las llamadas a cupTest si el compilador no está completo. Esto es debido a que 
+		// aún no se tendrá implementada la generación de código intermedio ni final.
+		// Para la entrega final deberán descomentarse y usarse.
+		List<ScopeIF> scopesList = scopeManager.getAllScopes(); // for debugging purposes
+		for (int j = 0; j < scopesList.size(); j++){
+			ScopeIF current = scopesList.get(j);
+			List myList = new ArrayList<TypeIF>(current.getTypeTable().getTypes());
+			for (int i = 0; i < myList.size(); i++){
+				System.out.println(myList.get(i));
+			}
+			List myList2 = new ArrayList<SymbolIF>(current.getSymbolTable().getSymbols()); 
+			for (int i = 0; i < myList2.size(); i++){
+				System.out.println(myList2.get(i));
+			}
+		}
+		scopeManager.closeScope();
+		syntaxErrorManager.syntaxInfo ("Parsing process ended.");
+	:};
+
+axiom ::= 
+{:
+	scopeManager.openScope("global");
+
+	ScopeIF scope = scopeManager.getCurrentScope();
+	scope.getTypeTable().addType(new TypeSimple(scope, "void"));
+	scope.getTypeTable().addType(new TypeSimple(scope, "int"));
+:}
+	seccionConstantes seccionTipos  axiom1;
 
 axiom1 ::= seccionVariables seccionFunciones  | seccionFunciones;
 
 seccionConstantes ::= declaracionConstante seccionConstantes
-                      | epsilon;
+	| epsilon;     
                       
-                      
-declaracionConstante ::= CONSTANTE IDENTIFICADOR NUMERO SEMI_COLON;
+declaracionConstante ::= CONSTANTE IDENTIFICADOR:name NUMERO:value SEMI_COLON
+{:
+	ScopeIF scope = scopeManager.getCurrentScope();
+	checkIfExistsSymbolWithinOpenScopes(name, false);
+	SymbolConstant<Integer> newSymbol = new SymbolConstant<Integer>(scope, name.getLexema(), scopeManager.searchType("int"), Integer.parseInt(value.getLexema()));
+	scope.getSymbolTable().addSymbol(newSymbol);
+:};
 
 seccionTipos ::= declaracionTipo seccionTipos
-                      | epsilon;
+	| epsilon;
                       
-declaracionTipo ::= TIPO ENTERO IDENTIFICADOR OPEN_BRACKET tamTipo CLOSE_BRACKET SEMI_COLON;
+declaracionTipo ::= TIPO ENTERO IDENTIFICADOR:identifier OPEN_BRACKET tamTipo:tamTipo CLOSE_BRACKET SEMI_COLON
+{:
+	ScopeIF scope = scopeManager.getCurrentScope();
+	checkIfExistsSymbolWithinOpenScopes(identifier, false);
+	TypeArray typeArray = new TypeArray(scope, identifier.getLexema(), Integer.parseInt(tamTipo.getValue()));
+	scope.getTypeTable().addType(typeArray);
+:};
 
-tamTipo ::= NUMERO | IDENTIFICADOR;
+tamTipo ::= NUMERO:n
+{:
+	ScopeIF scope = scopeManager.getCurrentScope();
+	if (Integer.parseInt(n.getLexema()) <= 0){ // if it is not positive
+		semanticErrorManager.semanticFatalError("Linea " + n.getLine() + " Columna " + n.getColumn() + " valor " + n.getLexema() + " fuera del rango");
+	}
+	TamTipo tamTipo = new TamTipo(n.getLexema());
+	RESULT = tamTipo;
+:}
+	| IDENTIFICADOR:s
+{:
+	SymbolIF symbol = checkIfExistsSymbolWithinOpenScopes(s, true);
+	if (!symbol.getType().getName().equals("int")){ // if it exists but it is not an integer
+		semanticErrorManager.semanticFatalError("Linea " + s.getLine() + " Columna " + s.getColumn() + " objeto " + s.getLexema() + " no es de tipo entero");
+	}
+	String value = ((SymbolConstant)symbol).getValue().toString();
+	if (Integer.parseInt(value) <= 0){ // if it exists and it is an integer but it is not positive
+		semanticErrorManager.semanticFatalError("Linea " + s.getLine() + " Columna " + s.getColumn() + " valor " + s.getLexema() + " fuera del rango");
+	}
+	TamTipo tamTipo = new TamTipo(((SymbolConstant)symbol).getValue().toString());
+	RESULT = tamTipo;
+:};
 
 seccionVariables ::= seccionVariables declaracionVariable | declaracionVariable;
 
-declaracionVariable ::= ENTERO listadoIDs SEMI_COLON
-                      | IDENTIFICADOR listadoIDs SEMI_COLON;
+declaracionVariable ::= ENTERO:identifier listadoIDs:list SEMI_COLON
+{:
+	ScopeIF scope = scopeManager.getCurrentScope();
+	for (int i = 0; i < list.size(); i++){
+		SymbolVariable<Integer> newSymbol = list.get(i).hasAssignmentValue() ?
+			new SymbolVariable(scope, list.get(i).getName(), scopeManager.searchType("int"), list.get(i).getValue()) :
+			new SymbolVariable(scope, list.get(i).getName(), scopeManager.searchType("int"), null);
+		scope.getSymbolTable().addSymbol(newSymbol);
+	}
+:}
+	| IDENTIFICADOR:identifier listadoIDs:list SEMI_COLON
+{:
+	ScopeIF scope = scopeManager.getCurrentScope();
+	TypeIF type = checkIfExistsTypeWithinOpenScopes(identifier, true);
+	for (int i = 0; i < list.size(); i++){
+		if (list.get(i).hasAssignmentValue()){ // if is being tried to be assigned
+			semanticErrorManager.semanticFatalError("Linea " + identifier.getLine() + " " + list.get(i).getName() + " no puede ser inicializado");
+		}
+		SymbolVariable<ArrayList> newSymbol = new SymbolVariable(scope, list.get(i).getName(), type, null);
+		scope.getSymbolTable().addSymbol(newSymbol);
+	}
+:};
                       
-listadoIDs ::= id listadoIDs1;
+listadoIDs ::= id:fullDeclaration listadoIDs1:restOfDeclarations
+{:
+	restOfDeclarations.add(fullDeclaration);
+	RESULT = restOfDeclarations;
+:};
 
-listadoIDs1 ::= COLON listadoIDs
-                      | epsilon;
+listadoIDs1 ::= COLON listadoIDs:list
+{:
+	RESULT = list;
+:}
+	| epsilon
+{:
+	ArrayList<Id> emptyList = new ArrayList();
+	RESULT = emptyList;
+:};
 
-id ::= IDENTIFICADOR id1;
+id ::= IDENTIFICADOR:identifier id1:declaration
+{:
+	checkIfExistsSymbolWithinOpenScopes(identifier, false);
+	Id fullDeclaration = new Id (identifier.getLexema(), declaration.hasAssignmentValue(), declaration.getValue());
+	RESULT = fullDeclaration;
+:};
 
 id1 ::= epsilon
-        | ASSIGN NUMERO;
+{:
+	Id1 declaration = new Id1(false, 0);
+	RESULT = declaration;
+:}
+    | ASSIGN NUMERO:n
+{:
+	Id1 declaration = new Id1(true, Integer.parseInt(n.getLexema()));
+	RESULT = declaration;
+:};
 
 seccionFunciones ::= funcion seccionFunciones
                       | funcionPrincipal;
                       
-funcion ::= VACIO IDENTIFICADOR  OPEN_KEY seccionParametros CLOSE_KEY OPEN_PARENTHESIS seccionTipos funcion1
-            | ENTERO IDENTIFICADOR  OPEN_KEY seccionParametros CLOSE_KEY OPEN_PARENTHESIS seccionTipos funcion1;
+funcion ::= VACIO IDENTIFICADOR:identifier  OPEN_KEY seccionParametros:params CLOSE_KEY
+{:
+	ScopeIF scope = scopeManager.getCurrentScope();
+	checkIfExistsSymbolWithinOpenScopes(identifier,  false);
+	SymbolProcedure newSymbol = new SymbolProcedure(scope, identifier.getLexema(), scopeManager.searchType("void"), params);
+	scope.getSymbolTable().addSymbol(newSymbol);
+:}
+OPEN_PARENTHESIS
+{:
+	scopeManager.openScope();
+:}
+seccionTipos funcion1
+	| ENTERO IDENTIFICADOR:identifier  OPEN_KEY seccionParametros:params CLOSE_KEY
+{:
+	ScopeIF scope = scopeManager.getCurrentScope();
+	checkIfExistsSymbolWithinOpenScopes(identifier, false);
+	SymbolFunction newSymbol = new SymbolFunction(scope, identifier.getLexema(), scopeManager.searchType("int"), params);
+	scope.getSymbolTable().addSymbol(newSymbol);
+:}
+OPEN_PARENTHESIS
+{:
+	scopeManager.openScope();
+:}
+seccionTipos funcion1;
                      
-         
+// TODO       
 funcion1 ::= listadoSentencias CLOSE_PARENTHESIS
-                      | seccionVariables listadoSentencias  CLOSE_PARENTHESIS;
+{:
+	scopeManager.closeScope();
+:}
+  | seccionVariables listadoSentencias  CLOSE_PARENTHESIS
+{:
+	scopeManager.closeScope();
+:};
 
 
 
 
 
-seccionParametros ::= declaracionParametros | epsilon;
+seccionParametros ::= declaracionParametros:params
+{:
+	RESULT = params;
+:} 
+	| epsilon
+{:
+	ArrayList<Parametro> params = new ArrayList();
+	RESULT = params;
+:};
 
-declaracionParametros  ::= parametro | parametro COLON declaracionParametros;
+declaracionParametros ::= parametro:param
+{:
+	ArrayList<Parametro> params = new ArrayList();
+	params.add(param);
+	RESULT = params;
+:}
+	| parametro:param COLON declaracionParametros:params
+{:
+	params.add(param);
+	RESULT = params;
+:};
 
-parametro ::= ENTERO IDENTIFICADOR | IDENTIFICADOR IDENTIFICADOR;
+parametro ::= ENTERO IDENTIFICADOR:name
+{:
+	Parametro param = new Parametro("int", name.getLexema());
+	RESULT = param;
+:}
+	| IDENTIFICADOR:identifier IDENTIFICADOR:name
+{:
+	ScopeIF scope = scopeManager.getCurrentScope();
+	TypeIF type = checkIfExistsTypeWithinOpenScopes(identifier, true);
+	Parametro param = new Parametro(type.getName(), name.getLexema());
+	RESULT = param;
+:};
 
-funcionPrincipal ::= VACIO principal OPEN_KEY CLOSE_KEY OPEN_PARENTHESIS seccionTipos listadoSentencias CLOSE_PARENTHESIS
-	|  VACIO principal OPEN_KEY CLOSE_KEY OPEN_PARENTHESIS seccionTipos seccionVariables listadoSentencias CLOSE_PARENTHESIS;
+funcionPrincipal ::= VACIO principal:p OPEN_KEY CLOSE_KEY OPEN_PARENTHESIS seccionTipos listadoSentencias CLOSE_PARENTHESIS
+{: 
+	ScopeIF scope = scopeManager.getCurrentScope();
+	SymbolProcedure newSymbol = new SymbolProcedure(scope, p.getLexema(), scopeManager.searchType("void"), new ArrayList<Parametro>());
+	scope.getSymbolTable().addSymbol(newSymbol);
+:}
+	|  VACIO principal:p OPEN_KEY CLOSE_KEY OPEN_PARENTHESIS seccionTipos seccionVariables listadoSentencias CLOSE_PARENTHESIS
+{:
+	ScopeIF scope = scopeManager.getCurrentScope();
+	SymbolProcedure newSymbol = new SymbolProcedure(scope, p.getLexema(), scopeManager.searchType("void"), new ArrayList<Parametro>());
+	scope.getSymbolTable().addSymbol(newSymbol);
+:};
 
 
 
