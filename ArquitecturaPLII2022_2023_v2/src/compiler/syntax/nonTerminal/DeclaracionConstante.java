@@ -1,27 +1,33 @@
 package compiler.syntax.nonTerminal;
 
 public class DeclaracionConstante extends NonTerminal {
-    private String identificador;
-    private int numero;
+    private String name;
+    private int value;
+    private int line;
 
     public DeclaracionConstante() {
         super();
-        this.identificador = "";
-        this.numero = 0;
+        this.name = "";
+        this.value = 0;
     }
 
-    public DeclaracionConstante(String identificador, int numero) {
+    public DeclaracionConstante(String name, int value, int line) {
         this();
-        this.identificador = identificador;
-        this.numero = numero;
+        this.name = name;
+        this.value = value;
+        this.line = line;
     }
 
-    public String getIdentificador() {
-        return this.identificador;
+    public String getName() {
+        return this.name;
     }
 
-    public int getNumero() {
-        return this.numero;
+    public int getValue() {
+        return this.value;
+    }
+
+    public int getLine(){
+        return this.line;
     }
 }
 

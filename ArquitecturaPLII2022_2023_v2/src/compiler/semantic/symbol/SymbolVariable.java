@@ -5,26 +5,28 @@ import es.uned.lsi.compiler.semantic.symbol.SymbolBase;
 import es.uned.lsi.compiler.semantic.type.TypeIF;
 
 /**
- * Class for SymbolVariable.
+ * Class for SymbolConstant.
  */
 
 // Student work
-//       Include properties to characterize variables
+//       Include properties to characterize constants
 
-public class SymbolVariable
+public class SymbolVariable<T>
     extends SymbolBase
-{  
-   
+{
+    private T value;
     /**
-     * Constructor for SymbolVariable.
+     * Constructor for SymbolConstant.
      * @param scope The declaration scope.
      * @param name The symbol name.
      * @param type The symbol type.
      */
-    public SymbolVariable (ScopeIF scope, 
-                           String name,
-                           TypeIF type)
+    public SymbolVariable (ScopeIF scope, String name, TypeIF type, T value)
     {
         super (scope, name, type);
-    } 
+        this.value = value;
+    }
+    public T getValue(){
+        return this.value;
+    }
 }

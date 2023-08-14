@@ -1,0 +1,27 @@
+#constante FALSO 0;
+#constante VERDADERO 1;
+#constante TAM 8;
+
+tipo entero vector1[TAM];
+tipo entero vector2[1];
+tipo entero vector3[1];
+
+vector1 miVector2, miVector3;
+entero a = 5, miEntero = 62, enterito, otroEntero = 2;
+vector2 miVector;
+
+entero sumar (entero x, vector3 y){
+    tipo entero vector1[TAM];
+    entero enteroDentroDeFuncion = 7, enteroDentroDeFuncion2;
+    devuelve x + y;
+}
+
+vacio sumarr (entero j){
+    devuelve x;
+}
+
+
+
+vacio principal () {
+    devuelve;
+}

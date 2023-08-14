@@ -1,8 +1,14 @@
 package compiler.syntax.nonTerminal;
 
 public class TamTipo extends NonTerminal {
-    public TamTipo() {
-        super();
+    private String value;
+
+    public TamTipo(String value) {
+        this.value = value;
+    }
+    
+    public String getValue(){
+        return this.value;
     }
 }
 
