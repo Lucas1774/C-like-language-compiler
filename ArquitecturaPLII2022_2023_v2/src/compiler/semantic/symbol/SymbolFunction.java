@@ -30,5 +30,9 @@ public class SymbolFunction
     {
         super (scope, name, type);
         this.listOfParameters = listOfParameters;
-    } 
+    }
+    
+    public ArrayList<Parametro> getParameters(){
+        return this.listOfParameters;
+    }
 }

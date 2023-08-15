@@ -26,6 +26,7 @@ public class SymbolConstant<T>
         super (scope, name, type);
         this.value = value;
     }
+    
     public T getValue(){
         return this.value;
     }

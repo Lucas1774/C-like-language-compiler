@@ -1,27 +1,19 @@
-#constante FALSO 0;
-#constante VERDADERO 1;
-#constante TAM 8;
-
-tipo entero vector1[TAM];
-tipo entero vector2[1];
-tipo entero vector3[1];
-
-vector1 miVector2, miVector3;
-entero a = 5, miEntero = 62, enterito, otroEntero = 2;
-vector2 miVector;
-
-entero sumar (entero x, vector3 y){
-    tipo entero vector1[TAM];
-    entero enteroDentroDeFuncion = 7, enteroDentroDeFuncion2;
-    devuelve x + y;
+#constante miConstante 6;
+entero resta(entero x){
+    tipo entero vector[2];
+    vector v;
+    devuelve 2 + 3;
 }
 
-vacio sumarr (entero j){
-    devuelve x;
+vacio suma (){
+    devuelve;
 }
-
-
 
 vacio principal () {
-    devuelve;
+entero a;
+
+a = resta(miConstante);
+escribeEnt(v);
+devuelve;
+
 }
