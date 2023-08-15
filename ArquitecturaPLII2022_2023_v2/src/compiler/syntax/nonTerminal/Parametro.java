@@ -1,19 +1,17 @@
 package compiler.syntax.nonTerminal;
 
+import es.uned.lsi.compiler.semantic.type.TypeIF;
+
 public class Parametro extends NonTerminal {
-    String type;
+    TypeIF type;
     String name;
 
-    public Parametro() {
-        super();
-    }
-
-    public Parametro(String type, String name){
+    public Parametro(TypeIF type, String name){
         this.type = type;
         this.name = name;
     }
 
-    public String getType(){
+    public TypeIF getType(){
         return this.type;
     }
 
@@ -23,7 +21,7 @@ public class Parametro extends NonTerminal {
 
     @Override
     public String toString(){
-        return this.name + " tipo " + this.type;
+        return this.name + " " + this.type;
     }
 }
 
