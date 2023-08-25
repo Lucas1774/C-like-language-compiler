@@ -1,13 +1,13 @@
 package compiler.syntax.nonTerminal;
 
-public class TamTipo extends NonTerminal {
-    private String value;
+public class TamTipo<T> extends NonTerminal {
+    private T value;
 
-    public TamTipo(String value) {
+    public TamTipo(T value) {
         this.value = value;
     }
     
-    public String getValue(){
+    public T getValue(){
         return this.value;
     }
 }
