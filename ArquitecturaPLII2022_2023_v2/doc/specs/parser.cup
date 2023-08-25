@@ -70,6 +70,36 @@ action code {:
 			}
 		}
 	}
+
+	public Expresion addIntermeidateCodeToArithmeticExpresion(Expresion result, Expresion operand1, Expresion operand2, String operation){
+		TemporalFactory tf = new TemporalFactory(scopeManager.getCurrentScope());
+		IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeManager.getCurrentScope());
+		TemporalIF temp = tf.create();
+		cb.addQuadruples(operand1.getIntermediateCode());
+		cb.addQuadruples(operand2.getIntermediateCode());
+		cb.addQuadruple(operation, temp, operand1.getTemporal(), operand2.getTemporal());
+		result.setTemporal(temp);
+		result.setIntermediateCode(cb.create());
+		return result;
+	}
+
+	public Expresion addIntermediateCodeToBooleanExpresion(Expresion result, Expresion operand1, Expresion operand2, String operation){
+		TemporalFactory tf = new TemporalFactory(scopeManager.getCurrentScope());
+		IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeManager.getCurrentScope());
+		TemporalIF temp = tf.create();
+		cb.addQuadruples(operand1.getIntermediateCode());
+		cb.addQuadruples(operand2.getIntermediateCode());
+		cb.addQuadruple(operation, temp, getCBooleanOfInt(operand1.getTemporal()), getCBooleanOfInt(operand2.getTemporal()));
+		result.setTemporal(temp);
+		result.setIntermediateCode(cb.create());
+		return result;
+	}
+	public int getCBooleanOfInt(Object a) {
+		if ((int)a > 0){
+			return 1;
+		}
+		return 0;
+	}
 :}	
 
 parser code {:
@@ -129,7 +159,7 @@ terminal Token STRING;
 // Declaracion de no terminales
 non terminal program;
 non terminal Axiom axiom;
-non terminal axiom1;
+non terminal Axiom1 axiom1;
 non terminal Id1 id1;
 non terminal ArrayList<Sentencia> funcion1;
 non terminal funcionPrincipal;
@@ -140,18 +170,18 @@ non terminal funcion;
 non terminal ArrayList<Parametro> seccionParametros;
 non terminal ArrayList<Parametro> declaracionParametros;
 non terminal Parametro parametro;
-non terminal seccionConstantes;
+non terminal ArrayList<DeclaracionConstante> seccionConstantes;
 non terminal DeclaracionConstante declaracionConstante;
-non terminal seccionTipos;
-non terminal declaracionTipo;
+non terminal ArrayList<DeclaracionTipo> seccionTipos;
+non terminal DeclaracionTipo declaracionTipo;
 non terminal TamTipo tamTipo;
-non terminal seccionVariables;
-non terminal declaracionVariable;
+non terminal ArrayList<DeclaracionVariable> seccionVariables;
+non terminal DeclaracionVariable declaracionVariable;
 non terminal ArrayList<Id> listadoIDs1;
 non terminal ArrayList<Id> listadoIDs;
 non terminal Id id;
 non terminal Expresion expresion;
-non terminal Expresion accesoVector;
+non terminal AccesoVector accesoVector;
 non terminal String llamadaFuncion;
 non terminal Sentencia bloque;
 non terminal bloque1;
@@ -159,7 +189,7 @@ non terminal ArrayList<Sentencia> listadoSentencias;
 non terminal Sentencia sentencia;
 non terminal Sentencia sentenciaIncremento;
 non terminal Sentencia sentenciaAsignacion;
-non terminal String ref;
+non terminal Referencia ref;
 non terminal Sentencia sentenciaAsignacionSuma;
 non terminal Sentencia sentenciaSi;
 non terminal Sentencia sentenciaAlternativas;
@@ -206,130 +236,129 @@ program ::=
 		// en las llamadas a cupTest si el compilador no está completo. Esto es debido a que 
 		// aún no se tendrá implementada la generación de código intermedio ni final.
 		// Para la entrega final deberán descomentarse y usarse.
-		List<ScopeIF> scopesList = scopeManager.getAllScopes(); // for debugging purposes
+
+		List<ScopeIF> scopesList = scopeManager.getAllScopes();
 		for (int j = 0; j < scopesList.size(); j++){
 			ScopeIF current = scopesList.get(j);
 			List myList = new ArrayList<TypeIF>(current.getTypeTable().getTypes());
 			for (int i = 0; i < myList.size(); i++){
-				System.out.println(myList.get(i));
+				syntaxErrorManager.syntaxInfo(myList.get(i).toString());
 			}
 			List myList2 = new ArrayList<SymbolIF>(current.getSymbolTable().getSymbols()); 
 			for (int i = 0; i < myList2.size(); i++){
-				System.out.println(myList2.get(i));
+				syntaxErrorManager.syntaxInfo(myList2.get(i).toString());
 			}
 		}
 		scopeManager.closeScope();
 		syntaxErrorManager.syntaxInfo ("Parsing process ended.");
 	:};
 
-axiom ::= 
-{:
+axiom ::= {:
 	scopeManager.openScope("global");
-	scopeManager.getCurrentScope().getTypeTable().addType(new TypeSimple(scopeManager.getCurrentScope(), "vacio"));
+	scopeManager.getCurrentScope().getTypeTable().addType(new TypeProcedure(scopeManager.getCurrentScope(), "vacio"));
 	scopeManager.getCurrentScope().getTypeTable().addType(new TypeSimple(scopeManager.getCurrentScope(), "entero"));
 :}
-	seccionConstantes seccionTipos  axiom1;
+	seccionConstantes:listaDeclaracionesConstantes seccionTipos:listaDeclaracionesTipos axiom1:a;
 
-axiom1 ::= seccionVariables seccionFunciones  | seccionFunciones;
+axiom1 ::= seccionVariables:listaDeclaracionesVariables seccionFunciones  | seccionFunciones {:
+
+:};
 
 seccionConstantes ::= declaracionConstante seccionConstantes
 	| epsilon;     
                       
-declaracionConstante ::= CONSTANTE IDENTIFICADOR:name NUMERO:value SEMI_COLON
-{:
+declaracionConstante ::= CONSTANTE IDENTIFICADOR:name NUMERO:value SEMI_COLON {:
 	checkIfExistsSymbolWithinOpenScopes(name, false);
-	SymbolConstant<Integer> newSymbol = new SymbolConstant<Integer>(scopeManager.getCurrentScope(), name.getLexema(), scopeManager.searchType("entero"), Integer.parseInt(value.getLexema()));
+	SymbolConstant newSymbol = new SymbolConstant(scopeManager.getCurrentScope(), name.getLexema(), scopeManager.searchType("entero"), Integer.parseInt(value.getLexema()));
 	scopeManager.getCurrentScope().getSymbolTable().addSymbol(newSymbol);
 :};
 
 seccionTipos ::= declaracionTipo seccionTipos
 	| epsilon;
                       
-declaracionTipo ::= TIPO ENTERO IDENTIFICADOR:identifier OPEN_BRACKET tamTipo:tamTipo CLOSE_BRACKET SEMI_COLON
-{:
+declaracionTipo ::= TIPO ENTERO IDENTIFICADOR:identifier OPEN_BRACKET tamTipo:tamTipo CLOSE_BRACKET SEMI_COLON {:
 	checkIfExistsTypeWithinOpenScopes(identifier, false);
-	TypeArray typeArray = new TypeArray(scopeManager.getCurrentScope(), identifier.getLexema(), Integer.parseInt(tamTipo.getValue()));
+	TypeArray typeArray = new TypeArray(scopeManager.getCurrentScope(), identifier.getLexema(), (int)tamTipo.getValue());
 	scopeManager.getCurrentScope().getTypeTable().addType(typeArray);
 :};
 
-tamTipo ::= NUMERO:n
-{:
+tamTipo ::= NUMERO:n {:
 	if (Integer.parseInt(n.getLexema()) <= 0){ // if it is not positive
 		semanticErrorManager.semanticFatalError("Linea " + n.getLine() + " Columna " + n.getColumn() + " valor " + n.getLexema() + " fuera del rango");
 	}
-	TamTipo tamTipo = new TamTipo(n.getLexema());
+	TamTipo tamTipo = new TamTipo(Integer.parseInt(n.getLexema()));
 	RESULT = tamTipo;
 :}
-	| IDENTIFICADOR:s
-{:
-	SymbolIF symbol = checkIfExistsSymbolWithinOpenScopes(s, true);
-	if (!symbol.getType().getName().equals("entero")){ // if it exists but it is not an integer
-		semanticErrorManager.semanticFatalError("Linea " + s.getLine() + " Columna " + s.getColumn() + " objeto " + s.getLexema() + " no es de tipo entero");
-	}
-	String value = ((SymbolConstant)symbol).getValue().toString();
-	if (Integer.parseInt(value) <= 0){ // if it exists and it is an integer but it is not positive
-		semanticErrorManager.semanticFatalError("Linea " + s.getLine() + " Columna " + s.getColumn() + " valor " + s.getLexema() + " fuera del rango");
-	}
-	TamTipo tamTipo = new TamTipo(((SymbolConstant)symbol).getValue().toString());
-	RESULT = tamTipo;
-:};
-
-seccionVariables ::= seccionVariables declaracionVariable | declaracionVariable;
-
-declaracionVariable ::= ENTERO:identifier listadoIDs:list SEMI_COLON
-{:
-	for (int i = 0; i < list.size(); i++){
-		SymbolVariable<Integer> newSymbol = list.get(i).hasAssignmentValue() ?
-			new SymbolVariable(scopeManager.getCurrentScope(), list.get(i).getName(), scopeManager.searchType("entero"), list.get(i).getValue()) :
-			new SymbolVariable(scopeManager.getCurrentScope(), list.get(i).getName(), scopeManager.searchType("entero"), null);
-		scopeManager.getCurrentScope().getSymbolTable().addSymbol(newSymbol);
-	}
-:}
-	| IDENTIFICADOR:identifier listadoIDs:list SEMI_COLON
-{:
-	TypeIF type = checkIfExistsTypeWithinOpenScopes(identifier, true);
-	for (int i = 0; i < list.size(); i++){
-		if (list.get(i).hasAssignmentValue()){ // if is being tried to be assigned
-			semanticErrorManager.semanticFatalError("Linea " + identifier.getLine() + " " + list.get(i).getName() + " no puede ser inicializado");
+	| IDENTIFICADOR:s {:
+		SymbolIF symbol = checkIfExistsSymbolWithinOpenScopes(s, true);
+		if (!(symbol instanceof SymbolConstant)){ // if it is not a constant)
+			semanticErrorManager.semanticFatalError("Linea " + s.getLine() + " Columna " + s.getColumn() + " identificador " + s.getLexema() + " no hace referencia a una constante");
 		}
-		SymbolVariable<ArrayList> newSymbol = new SymbolVariable(scopeManager.getCurrentScope(), list.get(i).getName(), type, null);
+		int value = ((SymbolConstant)symbol).getValue();
+		if (value <= 0){ // if it is a constant (and thus an integer) but 0
+			semanticErrorManager.semanticFatalError("Linea " + s.getLine() + " Columna " + s.getColumn() + " valor " + s.getLexema() + " debe ser positivo");
+		}
+		TamTipo tamTipo = new TamTipo(value);
+		RESULT = tamTipo;
+	:};
+
+seccionVariables ::= seccionVariables:dvs declaracionVariable:dv {:
+	dvs.add(dv);
+	RESULT = dvs;
+:}
+	| declaracionVariable{:
+		ArrayList<DeclaracionVariable> dvs = new ArrayList<DeclaracionVariable>();
+		RESULT = dvs;
+	:};
+
+declaracionVariable ::= ENTERO:identifier listadoIDs:list SEMI_COLON {:
+	for (int i = 0; i < list.size(); i++){
+		SymbolVariable newSymbol =	new SymbolVariable(scopeManager.getCurrentScope(), list.get(i).getName(), scopeManager.searchType("entero"));
 		scopeManager.getCurrentScope().getSymbolTable().addSymbol(newSymbol);
 	}
-:};
+	DeclaracionVariable dv = new DeclaracionVariable ("entero", list);
+	RESULT = dv;
+:}
+	| IDENTIFICADOR:identifier listadoIDs:list SEMI_COLON {:
+		TypeIF type = checkIfExistsTypeWithinOpenScopes(identifier, true);
+		for (int i = 0; i < list.size(); i++){
+			if (list.get(i).hasAssignmentValue()){ // if is being tried to be assigned
+				semanticErrorManager.semanticFatalError("Linea " + identifier.getLine() + " " + list.get(i).getName() + " no puede ser inicializado");
+			}
+			SymbolVariable newSymbol = new SymbolVariable(scopeManager.getCurrentScope(), list.get(i).getName(), type);
+			scopeManager.getCurrentScope().getSymbolTable().addSymbol(newSymbol);
+		}
+		DeclaracionVariable dv = new DeclaracionVariable (type.getName(), list);
+		RESULT = dv;
+	:};
                       
-listadoIDs ::= id:fullDeclaration listadoIDs1:restOfDeclarations
-{:
+listadoIDs ::= id:fullDeclaration listadoIDs1:restOfDeclarations {:
 	restOfDeclarations.add(fullDeclaration);
 	RESULT = restOfDeclarations;
 :};
 
-listadoIDs1 ::= COLON listadoIDs:list
-{:
+listadoIDs1 ::= COLON listadoIDs:list {:
 	RESULT = list;
 :}
-	| epsilon
-{:
-	ArrayList<Id> emptyList = new ArrayList();
-	RESULT = emptyList;
-:};
+	| epsilon {:
+		ArrayList<Id> emptyList = new ArrayList();
+		RESULT = emptyList;
+	:};
 
-id ::= IDENTIFICADOR:identifier id1:declaration
-{:
+id ::= IDENTIFICADOR:identifier id1:declaration {:
 	checkIfExistsSymbolWithinOpenScopes(identifier, false);
 	Id fullDeclaration = new Id (identifier.getLexema(), declaration.hasAssignmentValue(), declaration.getValue());
 	RESULT = fullDeclaration;
 :};
 
-id1 ::= epsilon
-{:
+id1 ::= epsilon {:
 	Id1 declaration = new Id1(false, 0);
 	RESULT = declaration;
 :}
-    | ASSIGN NUMERO:n
-{:
-	Id1 declaration = new Id1(true, Integer.parseInt(n.getLexema()));
-	RESULT = declaration;
-:};
+    | ASSIGN NUMERO:n {:
+		Id1 declaration = new Id1(true, Integer.parseInt(n.getLexema()));
+		RESULT = declaration;
+	:};
 
 seccionFunciones ::= funcion seccionFunciones
                       | funcionPrincipal;
@@ -337,22 +366,6 @@ seccionFunciones ::= funcion seccionFunciones
 funcion ::= VACIO IDENTIFICADOR:identifier  OPEN_KEY seccionParametros:params CLOSE_KEY {:
 	checkIfExistsSymbolWithinOpenScopes(identifier,  false);
 	SymbolProcedure newSymbol = new SymbolProcedure(scopeManager.getCurrentScope(), identifier.getLexema(), scopeManager.searchType("vacio"), params);
-	scopeManager.getCurrentScope().getSymbolTable().addSymbol(newSymbol);
-:}
-OPEN_PARENTHESIS
-{:
-	scopeManager.openScope();
-	for (int i = 0; i < params.size(); i++){
-		TypeIF type = params.get(i).getType();
-		SymbolParameter<?> newSymbol = new SymbolParameter<>(scopeManager.getCurrentScope(), params.get(i).getName(), params.get(i).getType(), null);
-		scopeManager.getCurrentScope().getSymbolTable().addSymbol(newSymbol);
-	}:}
-seccionTipos funcion1:list {:
-	checkIfReturnTypesMatch(list, "VACIO", Integer.toString(identifier.getLine()));
-:}
-	| ENTERO IDENTIFICADOR:identifier  OPEN_KEY seccionParametros:params CLOSE_KEY {:
-	checkIfExistsSymbolWithinOpenScopes(identifier, false);
-	SymbolFunction newSymbol = new SymbolFunction(scopeManager.getCurrentScope(), identifier.getLexema(), scopeManager.searchType("entero"), params);
 	scopeManager.getCurrentScope().getSymbolTable().addSymbol(newSymbol);
 :}
 OPEN_PARENTHESIS {:
@@ -364,209 +377,281 @@ OPEN_PARENTHESIS {:
 	}
 :}
 seccionTipos funcion1:list {:
+	checkIfReturnTypesMatch(list, "VACIO", Integer.toString(identifier.getLine()));
+:}
+	| ENTERO IDENTIFICADOR:identifier  OPEN_KEY seccionParametros:params CLOSE_KEY {:
+		checkIfExistsSymbolWithinOpenScopes(identifier, false);
+		SymbolFunction newSymbol = new SymbolFunction(scopeManager.getCurrentScope(), identifier.getLexema(), scopeManager.searchType("entero"), params);
+		scopeManager.getCurrentScope().getSymbolTable().addSymbol(newSymbol);
+	:}
+	OPEN_PARENTHESIS {:
+		scopeManager.openScope();
+		for (int i = 0; i < params.size(); i++){
+			TypeIF type = params.get(i).getType();
+			SymbolParameter<?> newSymbol = new SymbolParameter<>(scopeManager.getCurrentScope(), params.get(i).getName(), params.get(i).getType(), null);
+			scopeManager.getCurrentScope().getSymbolTable().addSymbol(newSymbol);
+		}
+	:}
+seccionTipos funcion1:list {:
 	checkIfReturnTypesMatch(list, "entero", Integer.toString(identifier.getLine()));
 :};
                
-funcion1 ::= listadoSentencias:list CLOSE_PARENTHESIS:p
-{:
+funcion1 ::= listadoSentencias:list CLOSE_PARENTHESIS:p {:
 	checkIfContainsReturn(list, Integer.toString(p.getLine()));
 	scopeManager.closeScope();
 	RESULT = list;
 :}
-  | seccionVariables listadoSentencias:list CLOSE_PARENTHESIS:p
-{:
-	checkIfContainsReturn(list, Integer.toString(p.getLine()));
-	scopeManager.closeScope();
-	RESULT = list;
-:};
+  | seccionVariables listadoSentencias:list CLOSE_PARENTHESIS:p {:
+		checkIfContainsReturn(list, Integer.toString(p.getLine()));
+		scopeManager.closeScope();
+		RESULT = list;
+	:};
 
-seccionParametros ::= declaracionParametros:params
-{:
+seccionParametros ::= declaracionParametros:params {:
 	RESULT = params;
 :} 
-	| epsilon
-{:
-	ArrayList<Parametro> params = new ArrayList();
-	RESULT = params;
-:};
+	| epsilon {:
+		ArrayList<Parametro> params = new ArrayList();
+		RESULT = params;
+	:};
 
-declaracionParametros ::= parametro:param
-{:
+declaracionParametros ::= parametro:param {:
 	ArrayList<Parametro> params = new ArrayList();
 	params.add(param);
 	RESULT = params;
 :}
-	| parametro:param COLON declaracionParametros:params
-{:
-	params.add(param);
-	RESULT = params;
-:};
+	| parametro:param COLON declaracionParametros:params {:
+		params.add(param);
+		RESULT = params;
+	:};
 
-parametro ::= ENTERO IDENTIFICADOR:name
-{:
+parametro ::= ENTERO IDENTIFICADOR:name {:
 	Parametro param = new Parametro(scopeManager.searchType("entero"), name.getLexema());
 	RESULT = param;
 :}
-	| IDENTIFICADOR:identifier IDENTIFICADOR:name
-{:
-	TypeIF type = checkIfExistsTypeWithinOpenScopes(identifier, true);
-	Parametro param = new Parametro(type, name.getLexema());
-	RESULT = param;
-:};
+	| IDENTIFICADOR:identifier IDENTIFICADOR:name {:
+		TypeIF type = checkIfExistsTypeWithinOpenScopes(identifier, true);
+		Parametro param = new Parametro(type, name.getLexema());
+		RESULT = param;
+	:};
 
 funcionPrincipal ::= VACIO principal:p OPEN_KEY CLOSE_KEY OPEN_PARENTHESIS {:
 	scopeManager.openScope("main");
-:} funcionPrincipal1:list {:
+:}
+
+funcionPrincipal1:list {:
 	checkIfContainsReturn(list, Integer.toString(p.getLine()));
 	checkIfReturnTypesMatch(list, "VACIO", Integer.toString(p.getLine()));
 	SymbolProcedure newSymbol = new SymbolProcedure(scopeManager.getCurrentScope(), p.getLexema(), scopeManager.searchType("vacio"), new ArrayList<Parametro>());
 	scopeManager.getCurrentScope().getSymbolTable().addSymbol(newSymbol);
-:} ;
+:};
 
 funcionPrincipal1 ::= seccionVariables listadoSentencias:list CLOSE_PARENTHESIS {:
 	scopeManager.closeScope();
 	RESULT = list;
-:}	| listadoSentencias:list CLOSE_PARENTHESIS
-{:
-	scopeManager.closeScope();
-	RESULT = list;
-:};
+:}
+	| listadoSentencias:list CLOSE_PARENTHESIS {:
+		scopeManager.closeScope();
+		RESULT = list;
+	:};
 
 
 // EXPRESIONES
 
 expresion ::= NUMERO:n {:
+	TemporalFactory tf = new TemporalFactory(scopeManager.getCurrentScope());
+	IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeManager.getCurrentScope());
+	TemporalIF temp = tf.create();
+	cb.addQuadruple("MV", temp, new Value(Integer.parseInt(n.getLexema())));
 	Expresion e = new Expresion(scopeManager.searchType("entero"), "constante", Integer.parseInt(n.getLexema()));
-	RESULT = e;
-:}	| IDENTIFICADOR:id {:
-	SymbolIF mySymbol = checkIfExistsSymbolWithinOpenScopes(id, true);
-	String subTipo = mySymbol.getClass() == SymbolConstant.class ? "constante" : "variable";
-	Object value = subTipo.equals("constante") ? ((SymbolConstant)mySymbol).getValue() : null;
-	Expresion e = new Expresion(mySymbol.getType(), subTipo, value);
-	RESULT = e;
-:}	|  OPEN_KEY expresion:e CLOSE_KEY {:
-	RESULT = e;
-:}	|  expresion:a PLUS:p expresion:b {:
-	if (!a.getType().getName().equals("entero") || !b.getType().getName().equals("entero")){
-		semanticErrorManager.semanticFatalError("Linea " + p.getLine() + " Columna " + p.getColumn() + " expresiones deben ser de tipo int");
-	}
-	String subTipo = a.getSubType().equals("constante") && b.getSubType().equals("constante") ? "constante" : "variable";
-	Object value = subTipo.equals("constante") ? Integer.parseInt(a.getValue().toString()) + Integer.parseInt(b.getValue().toString()) : null;
-	Expresion e = new Expresion(scopeManager.searchType("entero"), subTipo, value);
-	RESULT = e;
-:}	|  expresion:a MULT:p expresion:b {:
-	if (!a.getType().getName().equals("entero") || !b.getType().getName().equals("entero")){
-		semanticErrorManager.semanticFatalError("Linea " + p.getLine() + " Columna " + p.getColumn() + " expresiones deben ser de tipo int");
-	}
-	String subTipo = a.getSubType().equals("constante") && b.getSubType().equals("constante") ? "constante" : "variable";
-	Object value = subTipo.equals("constante") ? Integer.parseInt(a.getValue().toString()) * Integer.parseInt(b.getValue().toString()) : null;
-	Expresion e = new Expresion(scopeManager.searchType("entero"), subTipo, value);
-	RESULT = e;
-:} 	|  expresion:a AUTO_INCREMENTO:p {:
-	if (!a.getType().getName().equals("entero")){
-		semanticErrorManager.semanticFatalError("Linea " + p.getLine() + " Columna " + p.getColumn() + " expresion debe ser de tipo int");
-	}
-	String subTipo = a.getSubType().equals("constante") ? "constante" : "variable";
-	Object value = subTipo.equals("constante") ? Integer.parseInt(a.getValue().toString()) + 1 : null;
-	Expresion e = new Expresion(scopeManager.searchType("entero"), subTipo, value);
-	RESULT = e;
-:} 	|  NEGACION:p expresion:a {:
-	if (!a.getType().getName().equals("entero")){
-		semanticErrorManager.semanticFatalError("Linea " + p.getLine() + " Columna " + p.getColumn() + " expresion debe ser de tipo int");
-	}
-	String subTipo = a.getSubType().equals("constante") ? "constante" : "variable";
-	Object value;
-	if (subTipo.equals("constante")){
-		value = Integer.parseInt(a.getValue().toString()) == 0 ? 1 : 0;
-	} else {
-		value = null;
-	}
-	Expresion e = new Expresion(scopeManager.searchType("entero"), subTipo, value);
+	e.setIntermediateCode(cb.create());
+	e.setTemporal(temp);
+	semanticErrorManager.semanticDebug("Codigo intermedio: " + e.getIntermediateCode());
 	RESULT = e;
 :}
- 	|  expresion:a LOWER_THAN:p expresion:b {:
-	if (!a.getType().getName().equals("entero") || !b.getType().getName().equals("entero")){
-		semanticErrorManager.semanticFatalError("Linea " + p.getLine() + " Columna " + p.getColumn() + " expresiones deben ser de tipo int");
-	}
-	String subTipo = a.getSubType().equals("constante") && b.getSubType().equals("constante") ? "constante" : "variable";
-	Object value;
-	if (subTipo.equals("constante")){
-		value = Integer.parseInt(a.getValue().toString()) < Integer.parseInt(b.getValue().toString()) ? 1 : 0;
-	} else {
-		value = null;
-	}
-	Expresion e = new Expresion(scopeManager.searchType("entero"), subTipo, value);
-	RESULT = e;
-:}
- 	|  expresion:a EQUAL:p expresion:b {:
-	if (!a.getType().getName().equals("entero") || !b.getType().getName().equals("entero")){
-		semanticErrorManager.semanticFatalError("Linea " + p.getLine() + " Columna " + p.getColumn() + " expresiones deben ser de tipo int");
-	}
-	String subTipo = a.getSubType().equals("constante") && b.getSubType().equals("constante") ? "constante" : "variable";
-	Object value;
-	if (subTipo.equals("constante")){
-		value = Integer.parseInt(a.getValue().toString()) == Integer.parseInt(b.getValue().toString()) ? 1 : 0;
-	} else {
-		value = null;
-	}
-	Expresion e = new Expresion(scopeManager.searchType("entero"), subTipo, value);
-	RESULT = e;
-:}
- 	|  expresion:a AND_LOGICA:p expresion:b {:
-	if (!a.getType().getName().equals("entero") || !b.getType().getName().equals("entero")){
-		semanticErrorManager.semanticFatalError("Linea " + p.getLine() + " Columna " + p.getColumn() + " expresiones deben ser de tipo int");
-	}
-	String subTipo = a.getSubType().equals("constante") && b.getSubType().equals("constante") ? "constante" : "variable";
-	Object value;
-	if (subTipo.equals("constante")){
-		value = Integer.parseInt(a.getValue().toString()) < Integer.parseInt(b.getValue().toString()) ? 1 : 0;
-	} else {
-		value = null;
-	}
-	Expresion e = new Expresion(scopeManager.searchType("entero"), subTipo, value);
-	RESULT = e;
-:}
- 	|  accesoVector{:
-	Expresion e = new Expresion(scopeManager.searchType("entero"), "variable", null);
-	RESULT = e;
-:}
- 	|  llamadaFuncion:name {:
-	SymbolIF mySymbol = scopeManager.searchSymbol(name);
-	Expresion e = new Expresion(mySymbol.getType(), "variable", null);
-	RESULT = e;
-:};
+	| IDENTIFICADOR:id {:
+		SymbolIF mySymbol = checkIfExistsSymbolWithinOpenScopes(id, true);
+		String subTipo = mySymbol instanceof SymbolConstant ? "constante" : "variable";
+		Object value = subTipo.equals("constante") ? ((SymbolConstant)mySymbol).getValue() : null;
 
-accesoVector ::= IDENTIFICADOR:id OPEN_BRACKET expresion:e  CLOSE_BRACKET {:
-	if (!e.getType().getName().equals("entero")){
+		TemporalFactory tf = new TemporalFactory(scopeManager.getCurrentScope());
+		IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeManager.getCurrentScope());
+		TemporalIF temp = tf.create();
+		if (mySymbol instanceof SymbolConstant){
+			cb.addQuadruple("MV", temp, new Value(value));
+		} else{
+			cb.addQuadruple("MV", temp, new Variable(id.getLexema(), mySymbol.getScope()));
+		}
+		Expresion e = new Expresion(mySymbol.getType(), subTipo, value);
+		e.setTemporal(temp);
+		e.setIntermediateCode(cb.create());
+		semanticErrorManager.semanticDebug("Codigo intermedio: " + e.getIntermediateCode());
+		RESULT = e;
+	:}
+		|  OPEN_KEY expresion:e CLOSE_KEY {:
+			RESULT = e;
+		:}
+			|  expresion:a PLUS:p expresion:b {:
+				if (!a.getType().getName().equals("entero") || !b.getType().getName().equals("entero")){
+					semanticErrorManager.semanticFatalError("Linea " + p.getLine() + " Columna " + p.getColumn() + " expresiones deben ser de tipo int");
+				}
+				String subTipo = a.getSubType().equals("constante") && b.getSubType().equals("constante") ? "constante" : "variable";
+				Object value = subTipo.equals("constante") ? Integer.parseInt(a.getValue().toString()) + Integer.parseInt(b.getValue().toString()) : null;
+				Expresion e = new Expresion(scopeManager.searchType("entero"), subTipo, value);
+				RESULT = e;
+				addIntermeidateCodeToArithmeticExpresion(e, a, b, "ADD");
+				semanticErrorManager.semanticDebug("Codigo intermedio: " + e.getIntermediateCode());
+			:}
+				|  expresion:a MULT:p expresion:b {:
+					if (!a.getType().getName().equals("entero") || !b.getType().getName().equals("entero")){
+						semanticErrorManager.semanticFatalError("Linea " + p.getLine() + " Columna " + p.getColumn() + " expresiones deben ser de tipo int");
+					}
+					String subTipo = a.getSubType().equals("constante") && b.getSubType().equals("constante") ? "constante" : "variable";
+					Object value = subTipo.equals("constante") ? Integer.parseInt(a.getValue().toString()) * Integer.parseInt(b.getValue().toString()) : null;
+					Expresion e = new Expresion(scopeManager.searchType("entero"), subTipo, value);
+					addIntermeidateCodeToArithmeticExpresion(e, a, b, "MUL");
+					semanticErrorManager.semanticDebug("Codigo intermedio: " + e.getIntermediateCode());
+					RESULT = e;
+				:} 
+					|  expresion:a AUTO_INCREMENTO:p {:
+						if (!a.getType().getName().equals("entero")){
+							semanticErrorManager.semanticFatalError("Linea " + p.getLine() + " Columna " + p.getColumn() + " expresion debe ser de tipo int");
+						}
+						String subTipo = a.getSubType().equals("constante") ? "constante" : "variable";
+						Object value = subTipo.equals("constante") ? Integer.parseInt(a.getValue().toString()) + 1 : null;
+						TemporalFactory tf = new TemporalFactory(scopeManager.getCurrentScope());
+						IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeManager.getCurrentScope());
+						TemporalIF temp = tf.create();
+						Expresion e = new Expresion(scopeManager.searchType("entero"), subTipo, value);
+						cb.addQuadruples(a.getIntermediateCode());
+						cb.addQuadruple("ADD", temp, a.getTemporal(), 1);
+						e.setTemporal(temp);
+						e.setIntermediateCode(cb.create());
+						semanticErrorManager.semanticDebug("Codigo intermedio: " + e.getIntermediateCode());
+						RESULT = e;
+					:} 
+						|  NEGACION:p expresion:a {:
+							if (!a.getType().getName().equals("entero")){
+								semanticErrorManager.semanticFatalError("Linea " + p.getLine() + " Columna " + p.getColumn() + " expresion debe ser de tipo int");
+							}
+							String subTipo = a.getSubType().equals("constante") ? "constante" : "variable";
+							Object value;
+							if (subTipo.equals("constante")){
+								value = Integer.parseInt(a.getValue().toString()) == 0 ? 1 : 0;
+							} else {
+								value = null;
+							}
+							TemporalFactory tf = new TemporalFactory(scopeManager.getCurrentScope());
+							IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeManager.getCurrentScope());
+							TemporalIF temp = tf.create();
+							Expresion e = new Expresion(scopeManager.searchType("entero"), subTipo, value);
+							cb.addQuadruples(a.getIntermediateCode());
+							cb.addQuadruple("NOT", temp, getCBooleanOfInt(a.getTemporal()));
+							e.setTemporal(temp);
+							e.setIntermediateCode(cb.create());
+							semanticErrorManager.semanticDebug("Codigo intermedio: " + e.getIntermediateCode());
+							RESULT = e;
+						:}
+							|  expresion:a LOWER_THAN:p expresion:b {:
+								if (!a.getType().getName().equals("entero") || !b.getType().getName().equals("entero")){
+									semanticErrorManager.semanticFatalError("Linea " + p.getLine() + " Columna " + p.getColumn() + " expresiones deben ser de tipo int");
+								}
+								String subTipo = a.getSubType().equals("constante") && b.getSubType().equals("constante") ? "constante" : "variable";
+								Object value;
+								if (subTipo.equals("constante")){
+									value = Integer.parseInt(a.getValue().toString()) < Integer.parseInt(b.getValue().toString()) ? 1 : 0;
+								} else {
+									value = null;
+								}
+								Expresion e = new Expresion(scopeManager.searchType("entero"), subTipo, value);
+								addIntermediateCodeToBooleanExpresion(e, a, b, "LS");
+								semanticErrorManager.semanticDebug("Codigo intermedio: " + e.getIntermediateCode());
+								RESULT = e;
+							:}
+								|  expresion:a EQUAL:p expresion:b {:
+									if (!a.getType().getName().equals("entero") || !b.getType().getName().equals("entero")){
+										semanticErrorManager.semanticFatalError("Linea " + p.getLine() + " Columna " + p.getColumn() + " expresiones deben ser de tipo int");
+									}
+									String subTipo = a.getSubType().equals("constante") && b.getSubType().equals("constante") ? "constante" : "variable";
+									Object value;
+									if (subTipo.equals("constante")){
+										value = Integer.parseInt(a.getValue().toString()) == Integer.parseInt(b.getValue().toString()) ? 1 : 0;
+									} else {
+										value = null;
+									}
+									Expresion e = new Expresion(scopeManager.searchType("entero"), subTipo, value);
+									addIntermediateCodeToBooleanExpresion(e, a, b, "EQ");
+									semanticErrorManager.semanticDebug("Codigo intermedio: " + e.getIntermediateCode());
+									RESULT = e;
+								:}
+									|  expresion:a AND_LOGICA:p expresion:b {:
+										if (!a.getType().getName().equals("entero") || !b.getType().getName().equals("entero")){
+											semanticErrorManager.semanticFatalError("Linea " + p.getLine() + " Columna " + p.getColumn() + " expresiones deben ser de tipo int");
+										}
+										String subTipo = a.getSubType().equals("constante") && b.getSubType().equals("constante") ? "constante" : "variable";
+										Object value;
+										if (subTipo.equals("constante")){
+											value = Integer.parseInt(a.getValue().toString()) < Integer.parseInt(b.getValue().toString()) ? 1 : 0;
+										} else {
+											value = null;
+										}
+										Expresion e = new Expresion(scopeManager.searchType("entero"), subTipo, value);
+										addIntermediateCodeToBooleanExpresion(e, a, b, "AND");
+										semanticErrorManager.semanticDebug("Codigo intermedio: " + e.getIntermediateCode());
+										RESULT = e;
+									:}
+										|  accesoVector:a {:
+											Expresion e = new Expresion(scopeManager.searchType("entero"), "variable", null);
+										:}
+											|  llamadaFuncion:name {:
+												SymbolIF mySymbol = scopeManager.searchSymbol(name);
+												Expresion e = new Expresion(mySymbol.getType(), "variable", null);
+												RESULT = e;
+											:};
+
+accesoVector ::= IDENTIFICADOR:id OPEN_BRACKET expresion:a  CLOSE_BRACKET {:
+	SymbolIF mySymbol = checkIfExistsSymbolWithinOpenScopes(id, true);
+	if (!(mySymbol.getType() instanceof TypeArray)){
+		semanticErrorManager.semanticFatalError("Linea " + id.getLine() + " Columna " + id.getColumn() + " identificador " + mySymbol.getName() + " no es un vector");
+	}
+	if (!a.getType().getName().equals("entero")){
 		semanticErrorManager.semanticFatalError("Linea " + id.getLine() + " Columna " + id.getColumn() + " expresion indice debe ser de tipo int");
 	}
-	SymbolIF mySymbol = checkIfExistsSymbolWithinOpenScopes(id, true);
-	Class<?> classOfType = mySymbol.getType().getClass();
-	if (classOfType != TypeArray.class){
-		semanticErrorManager.semanticFatalError("Linea " + id.getLine() + " Columna " + id.getColumn() + " identificador " + mySymbol.getName() + " no es un vector");
-	}
-	if (!e.getType().getName().equals("entero")){
-		semanticErrorManager.semanticFatalError("Linea " + id.getLine() + " Columna " + id.getColumn() + " identificador " + mySymbol.getName() + " no es un vector");
-	}
-	if (e.getSubType().equals("constante")){
+	if (a.getSubType().equals("constante")){
 		int maxLength = ((TypeArray)mySymbol.getType()).getLength();
-		int index = (int)e.getValue();
+		int index = (int)a.getValue();
 		if (index < 0 || index >= maxLength){
-			semanticErrorManager.semanticFatalError("Linea " + id.getLine() + " Columna " + id.getColumn() + " expresion con valor " + index +" fuera de rango 0-" + maxLength);
+			semanticErrorManager.semanticFatalError("Linea " + id.getLine() + " Columna " + id.getColumn() + " expresion con valor " + index +" fuera de rango [0-" + (maxLength - 1) + "]");
 		}
 	}
+	TemporalFactory tf = new TemporalFactory(scopeManager.getCurrentScope());
+	IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeManager.getCurrentScope());
+	TemporalIF temp = tf.create();
+	TemporalIF temp1 = tf.create();
+	TemporalIF temp2 = tf.create();
+	Expresion e = new Expresion(scopeManager.searchType("entero"), "variable", null);
+	TemporalIF tempPosicion = a.getTemporal(); 
+	SymbolIF symbolVariable = scopeManager.searchSymbol(id.getLexema());
+	Variable var = new Variable(id.getLexema(), symbolVariable.getScope());
+	cb.addQuadruple("MVA", temp1, var);
+	cb.addQuadruple("ADD", temp2, temp1, tempPosicion); 
+	cb.addQuadruple("MVP", temp, temp2);
+	e.setTemporal(temp);
+	e.setIntermediateCode (cb.create());
+	semanticErrorManager.semanticDebug("Codigo intermedio: " + e.getIntermediateCode());
+	AccesoVector accesoVector = new AccesoVector (id.getLexema(), (int)a.getValue());
+	RESULT = accesoVector;
 :};
 
 sentenciaLlamadaFuncion ::= llamadaFuncion SEMI_COLON;
 
 llamadaFuncion ::= IDENTIFICADOR:id OPEN_KEY parametros:list CLOSE_KEY {:
 	SymbolIF mySymbol = checkIfExistsSymbolWithinOpenScopes(id, true);
-	Class<?> classOfSymbol = mySymbol.getClass();
-	if (classOfSymbol != SymbolFunction.class && classOfSymbol != SymbolProcedure.class){
+	if (!(mySymbol instanceof SymbolFunction) && (!(mySymbol instanceof SymbolProcedure))){
 		semanticErrorManager.semanticFatalError("Linea " + id.getLine() + " Columna " + id.getColumn() + " identificador " + mySymbol.getName() + " no es una funcion");
 	}
 	ArrayList<Parametro> listaOriginal = new ArrayList();
-	if (classOfSymbol == SymbolFunction.class){
+	if (mySymbol instanceof SymbolFunction){
 		listaOriginal = ((SymbolFunction)mySymbol).getParameters();
 	} else {
 		listaOriginal = ((SymbolProcedure)mySymbol).getParameters();
@@ -580,133 +665,147 @@ llamadaFuncion ::= IDENTIFICADOR:id OPEN_KEY parametros:list CLOSE_KEY {:
 		}
 	}
 	RESULT = id.getLexema();
-:}	| IDENTIFICADOR:id OPEN_KEY CLOSE_KEY {:
-	SymbolIF mySymbol = checkIfExistsSymbolWithinOpenScopes(id, true);
-	Class<?> classOfSymbol = mySymbol.getClass();
-	if (classOfSymbol != SymbolFunction.class && classOfSymbol != SymbolProcedure.class){
-		semanticErrorManager.semanticFatalError("Linea " + id.getLine() + " Columna " + id.getColumn() + " identificador " + mySymbol.getName() + " no es una funcion");
-	}
-	ArrayList<Parametro> listaOriginal = new ArrayList();
-	if (classOfSymbol == SymbolFunction.class){
-		listaOriginal = ((SymbolFunction)mySymbol).getParameters();
-	} else {
-		listaOriginal = ((SymbolProcedure)mySymbol).getParameters();
-	}
-	ArrayList<Parametro> list = new ArrayList<Parametro>();
-	if (listaOriginal.size() != list.size()){
-		semanticErrorManager.semanticFatalError("Linea " + id.getLine() + " funcion " + mySymbol.getName() + " parametros esperados " + listaOriginal.size() + " parametros obtenidos " + list.size());
-	}
-	RESULT = id.getLexema();
-:};
+:}
+	| IDENTIFICADOR:id OPEN_KEY CLOSE_KEY {:
+		SymbolIF mySymbol = checkIfExistsSymbolWithinOpenScopes(id, true);
+		if (!(mySymbol instanceof SymbolFunction) && (!(mySymbol instanceof SymbolProcedure))){
+			semanticErrorManager.semanticFatalError("Linea " + id.getLine() + " Columna " + id.getColumn() + " identificador " + mySymbol.getName() + " no es una funcion");
+		}
+		ArrayList<Parametro> listaOriginal = new ArrayList();
+		if (mySymbol instanceof SymbolFunction){
+			listaOriginal = ((SymbolFunction)mySymbol).getParameters();
+		} else {
+			listaOriginal = ((SymbolProcedure)mySymbol).getParameters();
+		}
+		if (listaOriginal.size() != 0){
+			semanticErrorManager.semanticFatalError("Linea " + id.getLine() + " funcion " + mySymbol.getName() + " parametros esperados " + listaOriginal.size() + " parametros obtenidos " + "0" );
+		}
+		RESULT = id.getLexema();
+	:};
 
 parametros ::= expresion:e {:
 	ArrayList<Expresion> list = new ArrayList<Expresion>();
 	list.add(e);
 	RESULT = list;
-:}  | expresion:e COLON parametros:list {:
-	list.add(e);
-	RESULT = list;	
-:};
+:} 
+	| expresion:e COLON parametros:list {:
+		list.add(e);
+		RESULT = list;	
+	:};
 
 //  SENTENCIAS
 
-bloque ::= OPEN_PARENTHESIS{:
+bloque ::= OPEN_PARENTHESIS {:
 	scopeManager.openScope();
 :} bloque1;
 
 bloque1 ::= seccionVariables listadoSentencias CLOSE_PARENTHESIS {:
 	scopeManager.closeScope();
-:}	| listadoSentencias CLOSE_PARENTHESIS{:
-	scopeManager.closeScope();
-:};
+:}
+	| listadoSentencias CLOSE_PARENTHESIS {:
+		scopeManager.closeScope();
+	:};
 
-listadoSentencias ::= listadoSentencias:list sentencia:s
-{:
+listadoSentencias ::= listadoSentencias:list sentencia:s {:
 	list.add(s);
 	RESULT = list;
 :}
-	| sentencia:s
-{:
-	ArrayList<Sentencia> list= new ArrayList<Sentencia>();
-	list.add(s);
-	RESULT = list;
-:};
+	| sentencia:s {:
+		ArrayList<Sentencia> list= new ArrayList<Sentencia>();
+		list.add(s);
+		RESULT = list;
+	:};
 
-sentencia ::= sentenciaDevuelve:sentencia
-{:
+sentencia ::= sentenciaDevuelve:sentencia {:
 	RESULT = sentencia;
 :}
-	| sentenciaIncremento
-{:
-	Sentencia sentencia = new Sentencia ("INCREMENTO");
-	RESULT = sentencia;
-:}
-	| sentenciaAsignacion
-{:
-	Sentencia sentencia = new Sentencia ("ASIGNACION");
-	RESULT = sentencia;
-:}
-	| sentenciaAsignacionSuma
-{:
-	Sentencia sentencia = new Sentencia ("ASIGNACIONSUMA");
-	RESULT = sentencia;
-:}
-	| sentenciaSi
-{:
-	Sentencia sentencia = new Sentencia ("SI");
-	RESULT = sentencia;
-:}
-	| sentenciaAlternativas
-{:
-	Sentencia sentencia = new Sentencia ("ALTERNATIVAS");
-	RESULT = sentencia;
-:}
-	| sentenciaMientras
-{:
-	Sentencia sentencia = new Sentencia ("MIENTRAS");
-	RESULT = sentencia;
-:}
-	| sentenciaLlamadaFuncion
-{:
-	Sentencia sentencia = new Sentencia ("LLAMADAFUNCION");
-	RESULT = sentencia;
-:}
-	| sentenciaSalida
-{:
-	Sentencia sentencia = new Sentencia ("SALIDA");
-	RESULT = sentencia;
-:}
-	| bloque
-{:
-	Sentencia sentencia = new Sentencia ("BLOQUE");
-	RESULT = sentencia;
-:};
+	| sentenciaIncremento {:
+		Sentencia sentencia = new Sentencia ("INCREMENTO");
+		RESULT = sentencia;
+	:}
+		| sentenciaAsignacion:sentencia {:
+			RESULT = sentencia;
+		:}
+			| sentenciaAsignacionSuma:sentencia {:
+				RESULT = sentencia;
+			:}
+				| sentenciaSi {:
+					Sentencia sentencia = new Sentencia ("SI");
+					RESULT = sentencia;
+				:}
+					| sentenciaAlternativas {:
+						Sentencia sentencia = new Sentencia ("ALTERNATIVAS");
+						RESULT = sentencia;
+					:}
+						| sentenciaMientras {:
+							Sentencia sentencia = new Sentencia ("MIENTRAS");
+							RESULT = sentencia;
+						:}
+							| sentenciaLlamadaFuncion {:
+								Sentencia sentencia = new Sentencia ("LLAMADAFUNCION");
+								RESULT = sentencia;
+							:}
+								| sentenciaSalida {:
+									Sentencia sentencia = new Sentencia ("SALIDA");
+									RESULT = sentencia;
+								:}
+									| bloque {:
+										Sentencia sentencia = new Sentencia ("BLOQUE");
+										RESULT = sentencia;
+									:};
 
 sentenciaDevuelve ::= DEVUELVE SEMI_COLON {:
 	Sentencia sentencia = new Sentencia ("DEVUELVE_VACIO");
 	RESULT = sentencia;
-:}	| DEVUELVE expresion:e SEMI_COLON {:	
-	Sentencia sentencia = new Sentencia ("DEVUELVE_" + e.getType().getName());
-	RESULT = sentencia;
-:};
+:}
+	| DEVUELVE expresion:e SEMI_COLON {:	
+		Sentencia sentencia = new Sentencia ("DEVUELVE_" + e.getType().getName());
+		RESULT = sentencia;
+	:};
 
-sentenciaIncremento ::= IDENTIFICADOR:id AUTO_INCREMENTO SEMI_COLON{:
+sentenciaIncremento ::= IDENTIFICADOR:id AUTO_INCREMENTO SEMI_COLON {:
 	SymbolIF mySymbol = checkIfExistsSymbolWithinOpenScopes(id, true);
 	if (!mySymbol.getType().getName().equals("entero")) {
 		semanticErrorManager.semanticFatalError("Linea " + id.getLine() + " Columna " +id.getColumn() + " no se puede aplicar autoincremento a objeto no de tipo entero");
 	}
 :};
 
-sentenciaAsignacion ::= ref:typeOfRef ASSIGN:a expresion:e SEMI_COLON{:
-	if (!e.getType().getName().equals(typeOfRef)){
-		semanticErrorManager.semanticFatalError("Linea " + a.getLine() + " no se puede asignar un " + e.getType().getName() + " a un " + typeOfRef);
+sentenciaAsignacion ::= ref:reference ASSIGN:a expresion:e SEMI_COLON {:
+	if (!e.getType().getName().equals("entero")){
+		semanticErrorManager.semanticFatalError("Linea " + a.getLine() + " no se puede asignar un " + e.getType().getName() + " a una variable");
 	}
+	TemporalFactoryIF tf = new TemporalFactory(scopeManager.getCurrentScope());
+	IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeManager.getCurrentScope());
+	TemporalIF temp = tf.create();
+	Sentencia sentencia = new Sentencia("ASIGNACION");
+	cb.addQuadruples(e.getIntermediateCode());
+	Variable var = new Variable(reference.getName(), scopeManager.searchSymbol(reference.getName()).getScope());
+	cb.addQuadruple("MVA", temp, var);
+	cb.addQuadruple("STP", temp, e.getTemporal());
+	sentencia.setIntermediateCode(cb.create());
+	semanticErrorManager.semanticDebug("Codigo intermedio: " + sentencia.getIntermediateCode());
+	RESULT = sentencia;
 :};
 
-sentenciaAsignacionSuma ::= ref:typeOfRef ASSIGN_SUMA:a expresion:e SEMI_COLON {:
-	if (!e.getType().getName().equals(typeOfRef)){
-		semanticErrorManager.semanticFatalError("Linea " + a.getLine() + " no se puede añadir un " + e.getType().getName() + " a un " + typeOfRef);
+sentenciaAsignacionSuma ::= ref:reference ASSIGN_SUMA:a expresion:e SEMI_COLON {:
+	if (!e.getType().getName().equals("entero")){
+		semanticErrorManager.semanticFatalError("Linea " + a.getLine() + " no se puede sumar un " + e.getType().getName() + " a una variable");
 	}
+	TemporalFactoryIF tf = new TemporalFactory(scopeManager.getCurrentScope());
+	IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeManager.getCurrentScope());
+	TemporalIF temp = tf.create();
+	TemporalIF temp1 = tf.create();
+	TemporalIF temp2 = tf.create();
+	Sentencia sentencia = new Sentencia("ASIGNACION_SUMA");
+	cb.addQuadruples(e.getIntermediateCode());
+	Variable var = new Variable(reference.getName(), scopeManager.searchSymbol(reference.getName()).getScope());
+	// TODO: finish this:
+	// cb.addQuadruple("ADD", temp1, ?, e.getTemporal());
+	cb.addQuadruple("MVA", temp, var);
+	cb.addQuadruple("STP", temp, temp1);
+	sentencia.setIntermediateCode(cb.create());
+	semanticErrorManager.semanticDebug("Codigo intermedio: " + sentencia.getIntermediateCode());
+	RESULT = sentencia;
 :};
 
 ref ::= IDENTIFICADOR:id {:
@@ -714,21 +813,24 @@ ref ::= IDENTIFICADOR:id {:
 	if (!mySymbol.getType().getName().equals("entero")){
 		semanticErrorManager.semanticFatalError("Linea " + id.getLine() + " el objeto " + id.getLexema() + " no es de tipo entero");
 	}
-	RESULT = mySymbol.getType().getName();
-:} | accesoVector {:
-	RESULT = "entero";
-:};
+	Referencia r = new Referencia(mySymbol.getName(), "IDENTIFICADOR", 0);
+	RESULT = r;
+:}
+	| accesoVector:a {:
+		Referencia r = new Referencia(a.getName(), "ACCESO_VECTOR", a.getValue());
+		RESULT = r;
+	:};
 
 sentenciaSi ::= SI:id OPEN_KEY expresion:e CLOSE_KEY sentencia SINO sentencia {:
 	if (!e.getType().getName().equals("entero")){
 		semanticErrorManager.semanticFatalError("Linea " + id.getLine() + " expresion no se puede evaluar a 0 u otro entero");
 	}
 :}
-	 | SI:id OPEN_KEY expresion:e CLOSE_KEY sentencia {:
-	if (!e.getType().getName().equals("entero")){
-		semanticErrorManager.semanticFatalError("Linea " + id.getLine() + " expresion no se puede evaluar a 0 u otro entero");
-	}
-:};
+	| SI:id OPEN_KEY expresion:e CLOSE_KEY sentencia {:
+		if (!e.getType().getName().equals("entero")){
+			semanticErrorManager.semanticFatalError("Linea " + id.getLine() + " expresion no se puede evaluar a 0 u otro entero");
+		}
+	:};
 	
 sentenciaAlternativas ::= ALTENATIVAS:id OPEN_KEY expresion:e {:
 	if (!e.getType().getName().equals("entero")){
@@ -749,10 +851,10 @@ sentenciaMientras ::= MIENTRAS:id OPEN_KEY expresion:e {:
 :} CLOSE_KEY sentencia;
 
 sentenciaSalida ::= ESCRIBE OPEN_KEY opcionesEscribe CLOSE_KEY SEMI_COLON
-	| ESCRIBE_ENT:id OPEN_KEY opcionesEscribeEnt:e{:
-	if (!e.getType().getName().equals("entero")){
-		semanticErrorManager.semanticFatalError("Linea " + id.getLine() + " la expresion no se puede evaluar a entero");
-	}
+	| ESCRIBE_ENT:id OPEN_KEY opcionesEscribeEnt:e {:
+		if (!e.getType().getName().equals("entero")){
+			semanticErrorManager.semanticFatalError("Linea " + id.getLine() + " la expresion no se puede evaluar a entero");
+		}
 	:} CLOSE_KEY SEMI_COLON;
 
 opcionesEscribe ::= epsilon | STRING;

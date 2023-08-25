@@ -1,7 +1,7 @@
-#constante miConstante 6;
+#constante miConstante 0;
+tipo entero vector[miConstante];
+
 entero resta(entero x){
-    tipo entero vector[2];
-    vector v;
     devuelve 2 + 3;
 }
 
@@ -10,10 +10,9 @@ vacio suma (){
 }
 
 vacio principal () {
-entero a;
-
-a = resta(miConstante);
-escribeEnt(v);
-devuelve;
-
+    entero a;
+    vector v;
+    a = resta(miConstante);
+    escribeEnt(3);
+    devuelve;
 }

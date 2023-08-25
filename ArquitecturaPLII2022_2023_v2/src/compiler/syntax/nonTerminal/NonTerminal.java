@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import es.uned.lsi.compiler.intermediate.QuadrupleIF;
+import es.uned.lsi.compiler.intermediate.TemporalIF;
 import es.uned.lsi.compiler.syntax.nonTerminal.NonTerminalIF;
 
 /**
@@ -13,6 +14,7 @@ public abstract class NonTerminal
     implements NonTerminalIF
 {
     private List<QuadrupleIF> intermediateCode;
+    private TemporalIF temp;
     
     /**
      * Constructor for NonTerminal.
@@ -39,6 +41,15 @@ public abstract class NonTerminal
     public void setIntermediateCode (List<QuadrupleIF> intermediateCode)
     {
         this.intermediateCode = intermediateCode;
+    }
+
+    public void setTemporal(TemporalIF temp) 
+    {
+        this.temp = temp;
+    }
+    
+    public TemporalIF getTemporal() {
+        return this.temp;
     }
     
 }

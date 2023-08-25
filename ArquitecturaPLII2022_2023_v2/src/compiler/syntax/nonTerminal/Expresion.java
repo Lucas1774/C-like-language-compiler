@@ -2,7 +2,7 @@ package compiler.syntax.nonTerminal;
 
 import es.uned.lsi.compiler.semantic.type.TypeIF;
 
-public class Expresion<T> {
+public class Expresion<T> extends NonTerminal {
     private TypeIF type;
     private String subType;
     private T value;

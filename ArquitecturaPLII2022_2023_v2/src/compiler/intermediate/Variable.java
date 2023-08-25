@@ -63,8 +63,11 @@ public class Variable
     @Override
     public final boolean isGlobal ()
     {
-        // Student work
-        return true;
+        if (this.scope.getName().equals("global"))
+        {
+            return true;
+        }
+        return false;
     }
 
     /**
