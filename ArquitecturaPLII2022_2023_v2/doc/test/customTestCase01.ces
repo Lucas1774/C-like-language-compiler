@@ -1,18 +1,22 @@
-#constante miConstante 0;
-tipo entero vector[miConstante];
+#constante VERDADERO 1;
+#constante FALSO 0;
+#constante TAM 7;
 
-entero resta(entero x){
-    devuelve 2 + 3;
-}
+tipo entero vector [TAM];
 
-vacio suma (){
-    devuelve;
-}
+entero suma;
+entero mayorDiez;
 
 vacio principal () {
-    entero a;
-    vector v;
-    a = resta(miConstante);
-    escribeEnt(3);
+    entero a, b;
+    a = 3;
+    b = 5;
+    suma = a + b; 
+    mayorDiez =  suma < 10;
+    si (mayorDiez == VERDADERO) {
+        escribe ("mayor");
+    } sino {
+        escribe ("menor");
+    }
     devuelve;
 }

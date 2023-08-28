@@ -1,6 +1,6 @@
 package compiler.syntax.nonTerminal;
 
-public class AccesoVector {
+public class AccesoVector extends NonTerminal {
     String name;
     int value;
 
