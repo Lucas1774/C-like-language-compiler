@@ -1,14 +1,8 @@
-entero suma, x, z;
+entero x, y;
 
 vacio principal () {
-    x = 2;
-    z = 7;
-    suma = x + z; 
-    escribe ("sarita guapi");
-    escribeEnt(suma);
-    escribeEnt();
-    escribe();
-    escribe();
-    escribe("hola de nuevo, sarita");
+    entero z = 1;
+    escribe("z = ");
+    escribeEnt(z);
     devuelve;
 }
