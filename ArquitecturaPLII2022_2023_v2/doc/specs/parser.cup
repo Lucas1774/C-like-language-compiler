@@ -96,6 +96,28 @@ action code {:
 		result.setIntermediateCode(cb.create());
 		return result;
 	}
+
+	public void tryToAssignAddressToOperands(SymbolIF symbol, List<QuadrupleIF> quadruples){
+		for (QuadrupleIF quadruple: quadruples) {
+			if (quadruple.getFirstOperand() instanceof Variable) {
+				if (((Variable)quadruple.getFirstOperand()).getScope() == symbol.getScope() && ((Variable)quadruple.getFirstOperand()).getName().equals(symbol.getName()) || symbol.getScope().getName().equals("global") && ((Variable)quadruple.getFirstOperand()).getName().equals(symbol.getName())){
+					((Variable)quadruple.getFirstOperand()).setAddress(((SymbolVariable)symbol).getAddress());
+				}
+			}
+			if (quadruple.getSecondOperand() instanceof Variable) {
+				if (((Variable)quadruple.getSecondOperand()).getScope() == symbol.getScope() && ((Variable)quadruple.getSecondOperand()).getName().equals(symbol.getName())
+				|| symbol.getScope().getName().equals("global") && ((Variable)quadruple.getSecondOperand()).getName().equals(symbol.getName())){
+					((Variable)quadruple.getSecondOperand()).setAddress(((SymbolVariable)symbol).getAddress());
+				}
+			}
+			if (quadruple.getResult() instanceof Variable) {
+				if (((Variable)quadruple.getResult()).getScope() == symbol.getScope() && ((Variable)quadruple.getResult()).getName().equals(symbol.getName())
+				|| symbol.getScope().getName().equals("global") && ((Variable)quadruple.getResult()).getName().equals(symbol.getName())){
+					((Variable)quadruple.getResult()).setAddress(((SymbolVariable)symbol).getAddress());
+				}
+			}
+		}
+	}
 :}	
 
 parser code {:
@@ -222,29 +244,79 @@ program ::=
     syntaxErrorManager.syntaxInfo ("Starting parsing...");
 :}
 	axiom:ax
-	{:   		
-		// No modificar esta estructura, aunque se pueden añadir más acciones semánticas
-		semanticErrorManager.semanticDebug("Codigo intermedio axioma: " + ax.getIntermediateCode());
-		List intermediateCode = ax.getIntermediateCode ();
-		//finalCodeFactory.create (intermediateCode);
+	{:
+		// Asignar direcciones
+		List<QuadrupleIF> listOfQuadruples = ax.getIntermediateCode();
+		ExecutionEnvironmentEns2001 executionEnvironmentEns2001 = new ExecutionEnvironmentEns2001();
+		List<ScopeIF> scopes = scopeManager.getAllScopes();
+		int staticAddress = executionEnvironmentEns2001.getMemorySize();
 
-		// En caso de no comentarse las dos sentencias anteriores se puede generar una excepcion
+		// asignar celdas a variables locales y temporales
+		for (ScopeIF scope: scopes) {
+			int raAddress = 4;
+
+			List<SymbolIF> symbols = scope.getSymbolTable().getSymbols();
+			boolean isStaticScope = scope.getLevel() == 0 || scope.getName().equals("main"); // ambientes estáticos
+			for (SymbolIF symbol: symbols) {
+				if (symbol instanceof SymbolVariable) { 
+					if (isStaticScope){ 
+						((SymbolVariable)symbol).setAddress(staticAddress);
+						tryToAssignAddressToOperands(symbol, listOfQuadruples); // sets address to operands that share scope and name
+						staticAddress = staticAddress - symbol.getType().getSize();
+					} else { // ambientes dinámicos (funciones auxiliares)
+						((SymbolVariable)symbol).setAddress(raAddress);
+						raAddress = raAddress + symbol.getType().getSize(); 
+					}
+				} 
+			}
+		}
+
+		for (ScopeIF scope: scopes) {
+			int raAddress = 4;
+			List<TemporalIF> temporals = scope.getTemporalTable ().getTemporals();
+			for (TemporalIF temporal: temporals) {
+				if (temporal instanceof Temporal) {
+					if (scope.getLevel() == 0 || scope.getName().equals("main")){ // ambientes estáticos
+						((Temporal)temporal).setAddress(staticAddress); 
+						staticAddress = staticAddress - 1; // TODO: 1 puede no ser apropiado
+					} else { // ambientes dinámicos (funciones auxiliares)
+						((Temporal)temporal).setAddress(raAddress); 
+						raAddress = raAddress + 1; // TODO: 1 puede no ser apropiado
+					}
+				} 
+			}
+		}
+
+		// Inicializar variables	
+		for (ScopeIF scope: scopes) {
+			IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
+			List<SymbolIF> symbols = scope.getSymbolTable ().getSymbols();
+			boolean isStaticScope = scope.getLevel() == 0 || scope.getName().equals("main");
+			if (isStaticScope) {
+				for (SymbolIF symbol: symbols) { 
+					if (symbol instanceof SymbolVariable) {
+						Variable var = new Variable(symbol.getName(), symbol.getScope());
+						var.setAddress(((SymbolVariable)symbol).getAddress());
+						cb.addQuadruple("VARGLOBAL", var, 0); 
+					}
+				}
+			} else{
+				// TODO: fill this, might need refactor.
+			}
+			cb.addQuadruples(ax.getIntermediateCode());
+			ax.setIntermediateCode(cb.create());
+		}
+		
+		// No modificar esta estructura, aunque se pueden añadir más acciones semánticas
+		//printamos el código intermedio generado
+		semanticErrorManager.semanticDebug("Codigo intermedio axioma con instruciones para variables: " + ax.getIntermediateCode());
+		List intermediateCode = ax.getIntermediateCode ();
+		finalCodeFactory.setEnvironment(CompilerContext.getExecutionEnvironment());
+		finalCodeFactory.create (intermediateCode);
+		// En caso de no comentarse las sentencias anteriores puede generar una excepcion
 		// en las llamadas a cupTest si el compilador no está completo. Esto es debido a que 
 		// aún no se tendrá implementada la generación de código intermedio ni final.
 		// Para la entrega final deberán descomentarse y usarse.
-
-		List<ScopeIF> scopesList = scopeManager.getAllScopes();
-		for (int j = 0; j < scopesList.size(); j++){
-			ScopeIF current = scopesList.get(j);
-			List myList = new ArrayList<TypeIF>(current.getTypeTable().getTypes());
-			for (int i = 0; i < myList.size(); i++){
-				syntaxErrorManager.syntaxInfo(myList.get(i).toString());
-			}
-			List myList2 = new ArrayList<SymbolIF>(current.getSymbolTable().getSymbols()); 
-			for (int i = 0; i < myList2.size(); i++){
-				syntaxErrorManager.syntaxInfo(myList2.get(i).toString());
-			}
-		}
 		scopeManager.closeScope();
 		syntaxErrorManager.syntaxInfo ("Parsing process ended.");
 	:};
@@ -257,6 +329,8 @@ axiom ::= {:
 	seccionConstantes seccionTipos axiom1:a {:
 	IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeManager.getCurrentScope());
 	cb.addQuadruples(a.getIntermediateCode());
+	cb.addQuadruple("HALT");
+		cb.addQuadruples(printQuadruplesList);
 	AxiomConcreto axiom = new AxiomConcreto();
 	axiom.setIntermediateCode(cb.create());
 	RESULT = axiom;
@@ -375,7 +449,6 @@ seccionFunciones ::= funcion:f seccionFunciones:list {:
 	RESULT = list;
 :}
     | funcionPrincipal:f {:
-		System.out.println(f);
 		ArrayList<Funcion> list = new ArrayList<Funcion>();
 		list.add(f);
 		RESULT = list;
@@ -499,7 +572,7 @@ expresion ::= NUMERO:n {:
 		if (mySymbol instanceof SymbolConstant){
 			cb.addQuadruple("MV", temp, new Value(value));
 		} else{
-			cb.addQuadruple("MV", temp, new Variable(id.getLexema(), mySymbol.getScope()));
+			cb.addQuadruple("MVP", temp, new Variable(id.getLexema(), mySymbol.getScope()));
 		}
 		Expresion e = new Expresion(mySymbol.getType(), subTipo, value);
 		e.setTemporal(temp);
@@ -656,7 +729,7 @@ accesoVector ::= IDENTIFICADOR:id OPEN_BRACKET expresion:a  CLOSE_BRACKET {:
 	Variable var = new Variable(id.getLexema(), symbolVariable.getScope());
 	cb.addQuadruples(a.getIntermediateCode());
 	cb.addQuadruple("MVA", temp1, var);
-	cb.addQuadruple("ADD", temp2, temp1, tempPosicion); 
+	cb.addQuadruple("SUB", temp2, temp1, tempPosicion); 
 	cb.addQuadruple("MVP", temp, temp2);
 	accesoVector.setTemporal(temp);
 	accesoVector.setIntermediateCode (cb.create());
@@ -922,30 +995,39 @@ sentenciaSalida ::= ESCRIBE OPEN_KEY grupoSintacticoEscribible:content CLOSE_KEY
 		RESULT = sentencia;
 	:} CLOSE_KEY SEMI_COLON;
 
-grupoSintacticoEscribible ::= epsilon | STRING:myString {:
-	TemporalFactory tF = new TemporalFactory(scopeManager.getCurrentScope());
+grupoSintacticoEscribible ::= epsilon {:
 	IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeManager.getCurrentScope());
-	LabelFactory lF = new LabelFactory();
-	LabelIF label = lF.create();
-	TemporalIF temp = tF.create();
 	GrupoSintacticoEscribible myGrupoSintacticoEscribible = new GrupoSintacticoEscribible();
-	cb.addQuadruple("WRITESTRING", temp, label); 
-	printQuadruplesList.add(new Quadruple("CADENA", new Label(myString.getLexema()), label)); 
+	cb.addQuadruple("WRITEEMPTY");
 	myGrupoSintacticoEscribible.setIntermediateCode(cb.create());
-	semanticErrorManager.semanticDebug("Codigo intermedio stringEscribible " + myString.getLexema() + ": " + myGrupoSintacticoEscribible.getIntermediateCode());
 	RESULT = myGrupoSintacticoEscribible;
-:};
+:}
+	| STRING:myString {:
+		TemporalFactory tF = new TemporalFactory(scopeManager.getCurrentScope());
+		IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeManager.getCurrentScope());
+		LabelFactory lF = new LabelFactory();
+		LabelIF label = lF.create();
+		TemporalIF temp = tF.create();
+		GrupoSintacticoEscribible myGrupoSintacticoEscribible = new GrupoSintacticoEscribible();
+		cb.addQuadruple("WRITESTRING", temp, label); 
+		printQuadruplesList.add(new Quadruple("CADENA", new Label(myString.getLexema()), label)); 
+		myGrupoSintacticoEscribible.setIntermediateCode(cb.create());
+		semanticErrorManager.semanticDebug("Codigo intermedio stringEscribible " + myString.getLexema() + ": " + myGrupoSintacticoEscribible.getIntermediateCode());
+		RESULT = myGrupoSintacticoEscribible;
+	:};
 
-grupoSintacticoEscribibleEntero ::= epsilon | expresion:e {:
-	TemporalFactory tF = new TemporalFactory(scopeManager.getCurrentScope());
+grupoSintacticoEscribibleEntero ::= epsilon {:
 	IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeManager.getCurrentScope());
-	LabelFactory lF = new LabelFactory();
-	LabelIF label = lF.create();
-	TemporalIF temp = tF.create();
-	cb.addQuadruples(e.getIntermediateCode());
-	cb.addQuadruple("WRITESTRING", temp, label); 
-	printQuadruplesList.add(new Quadruple("CADENA", new Label(e.getTemporal().toString()), label)); 
+	Expresion e = new Expresion(scopeManager.searchType("entero"), "null", "null");
+	cb.addQuadruple("WRITEEMPTY");
 	e.setIntermediateCode(cb.create());
-	semanticErrorManager.semanticDebug("Codigo intermedio expresionEscribible " + e.getValue() + ": " + e.getIntermediateCode());
 	RESULT = e;
-:};
+:}
+	| expresion:e {:
+		IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeManager.getCurrentScope());
+		cb.addQuadruples(e.getIntermediateCode());
+		cb.addQuadruple("WRITEINT", e.getTemporal());
+		e.setIntermediateCode(cb.create());
+		semanticErrorManager.semanticDebug("Codigo intermedio expresionEscribible " + e.getValue() + ": " + e.getIntermediateCode());
+		RESULT = e;
+	:};

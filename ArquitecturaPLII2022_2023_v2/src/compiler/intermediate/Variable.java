@@ -12,6 +12,7 @@ public class Variable
 {
     private String  name     = null;
     private ScopeIF scope    = null;
+    private int address;
         
     /**
      * Constructor for Variable.
@@ -45,6 +46,11 @@ public class Variable
         return scope;
     }
 
+    public void setAddress (int address)
+    {
+        this.address = address;
+    }
+
     /**
      * Returns the address.
      * @return Returns the address.
@@ -52,8 +58,7 @@ public class Variable
     @Override
     public final int getAddress ()
     {
-        // Student work
-        return 0;
+        return this.address;
     }
 
     /**
