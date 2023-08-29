@@ -39,7 +39,6 @@ public class TypeArray
     @Override
     public int getSize ()
     {
-        // Student work
-        return 1;
+        return this.length;
     }
 }

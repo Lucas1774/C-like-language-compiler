@@ -1,22 +1,14 @@
-#constante VERDADERO 1;
-#constante FALSO 0;
-#constante TAM 7;
-
-tipo entero vector [TAM];
-
-entero suma;
-entero mayorDiez;
+entero suma, x, z;
 
 vacio principal () {
-    entero a, b;
-    a = 3;
-    b = 5;
-    suma = a + b; 
-    mayorDiez =  suma < 10;
-    si (mayorDiez == VERDADERO) {
-        escribe ("mayor");
-    } sino {
-        escribe ("menor");
-    }
+    x = 2;
+    z = 7;
+    suma = x + z; 
+    escribe ("sarita guapi");
+    escribeEnt(suma);
+    escribeEnt();
+    escribe();
+    escribe();
+    escribe("hola de nuevo, sarita");
     devuelve;
 }

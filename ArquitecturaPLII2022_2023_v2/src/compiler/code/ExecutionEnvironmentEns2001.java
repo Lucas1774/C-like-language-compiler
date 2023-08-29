@@ -3,11 +3,16 @@ package compiler.code;
 import java.util.Arrays;
 import java.util.List;
 
+import compiler.intermediate.Label;
+import compiler.intermediate.Temporal;
+import compiler.intermediate.Value;
+import compiler.intermediate.Variable;
 import compiler.semantic.type.TypeSimple;
 
 import es.uned.lsi.compiler.code.ExecutionEnvironmentIF;
 import es.uned.lsi.compiler.code.MemoryDescriptorIF;
 import es.uned.lsi.compiler.code.RegisterDescriptorIF;
+import es.uned.lsi.compiler.intermediate.OperandIF;
 import es.uned.lsi.compiler.intermediate.QuadrupleIF;
 
 /**
@@ -92,8 +97,99 @@ public class ExecutionEnvironmentEns2001
      */
     @Override
     public final String translate (QuadrupleIF quadruple)
-    {      
-        //Student work
-        return quadruple.toString(); 
+    {
+        StringBuffer b = new StringBuffer();
+        String operand1 = translateOperand(quadruple.getFirstOperand());
+        String operand2 = translateOperand(quadruple.getSecondOperand());
+        String result = translateOperand(quadruple.getResult());
+        b.append(";" + quadruple.toString() + "\n"); // quadrupla en string para debug. ENS la ignora
+        switch (quadruple.getOperation()){
+            case "ADD":
+                b.append("ADD " + operand1 + ", " + operand2 + "\n");
+                b.append("MOVE " + ".A " + ", " + result);
+                break;
+            case "SUB":
+                b.append("SUB " + operand1 + ", " + operand2 + "\n");
+                b.append("MOVE " + ".A " + ", " + result);
+                break;
+            case "MUL":
+                break;
+            case "INC":
+                break;
+            case "NEG":
+                break;
+            case "EQ":
+                break;
+            case "LS":
+                break;
+            case "AND":
+                break;
+            case "NOT":
+                break;
+            case "BR":
+                break;
+            case "BRT":
+                break;
+            case "BRF":
+                break;
+            case "INL":
+                break;
+            case "MV":
+                b.append("MOVE " + operand1 + ", " + result);
+                break;
+            case "MVA":
+                b.append("MOVE #" + operand1.replace("/", "") + ", " + result);
+                break;
+            case "MVP":
+                b.append("MOVE " + operand1 + ", " + result);
+                break;
+            case "STP":
+                b.append("MOVE " + result + ", " + ".R1\n");
+                b.append("MOVE " + operand1 + ", " + "[.R1]");
+                break;
+            case "HALT":
+                b.append("HALT");
+                break;
+            case "WRITESTRING":
+                b.append("WRSTR /" + operand1);
+                break;
+            case "WRITEINT":
+                b.append("WRINT " + result);
+                break;
+            case "WRITEEMPTY":
+                b.append("WRCHAR #10");
+                break;
+            case "CADENA":
+                b.append(operand1 + ": DATA " + result);
+                break;
+            case "VARGLOBAL":
+                b.append("MOVE " + operand1 + ", " + result);
+                break;
+            default:
+                break;
+        }
+        b.append("\n");
+        return b.toString(); 
+    }
+
+    private boolean isStatic(Object operand) {
+        return operand instanceof Variable ? ((Variable)operand).getScope().getLevel() == 0 || ((Variable)operand).getScope().getName().equals("main") :
+        operand instanceof Temporal ? ((Temporal)operand).getScope().getLevel() == 0 || ((Temporal)operand).getScope().getName().equals("main") :
+        false;
+    }
+
+    private String translateOperand (OperandIF operand) {
+        if (operand instanceof Variable) {
+            return isStatic((Variable)operand) ? "/" + ((Variable)operand).getAddress() :
+            "#-" + ((Variable)operand).getAddress() + "[.IX]";
+        } else if (operand instanceof Temporal){
+            return isStatic ((Temporal)operand) ? "/" + ((Temporal)operand).getAddress() :
+            "#-" + ((Temporal)operand).getAddress() + "[.IX]";
+        } else if (operand instanceof Value){ 
+            return "#" + ((Value)operand).getValue();
+        } else if (operand instanceof Label){
+            return ((Label)operand).getName();
+        }
+        return null;
     }
 }
