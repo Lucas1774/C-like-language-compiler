@@ -180,11 +180,11 @@ non terminal Axiom axiom;
 non terminal Axiom1 axiom1;
 non terminal Id1 id1;
 non terminal Funcion funcionPrincipal;
-non terminal ArrayList<Sentencia> funcionPrincipal1;
+non terminal Funcion funcionPrincipal1;
 non terminal epsilon;
 non terminal ArrayList<Funcion> seccionFunciones;
 non terminal Funcion funcion;
-non terminal ArrayList<Sentencia> funcion1;
+non terminal Funcion funcion1;
 non terminal ArrayList<Parametro> seccionParametros;
 non terminal ArrayList<Parametro> declaracionParametros;
 non terminal Parametro parametro;
@@ -193,8 +193,8 @@ non terminal declaracionConstante;
 non terminal seccionTipos;
 non terminal declaracionTipo;
 non terminal TamTipo tamTipo;
-non terminal seccionVariables;
-non terminal declaracionVariable;
+non terminal ArrayList<Id> seccionVariables;
+non terminal ArrayList<Id> declaracionVariable;
 non terminal ArrayList<Id> listadoIDs1;
 non terminal ArrayList<Id> listadoIDs;
 non terminal Id id;
@@ -297,7 +297,7 @@ program ::=
 					if (symbol instanceof SymbolVariable) {
 						Variable var = new Variable(symbol.getName(), symbol.getScope());
 						var.setAddress(((SymbolVariable)symbol).getAddress());
-						cb.addQuadruple("VARGLOBAL", var, 0); 
+						cb.addQuadruple("VARSTATIC", var, 0); 
 					}
 				}
 			} else{
@@ -336,9 +336,16 @@ axiom ::= {:
 	RESULT = axiom;
 	:};
 
-axiom1 ::= seccionVariables seccionFunciones:listaFunciones {:
+axiom1 ::= seccionVariables:listaVariables seccionFunciones:listaFunciones {:
 	IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeManager.getCurrentScope());
+	for (int i = 0; i < listaVariables.size(); i++){
+		cb.addQuadruples(listaVariables.get(i).getIntermediateCode());
+	}
 	for (int i = 0; i < listaFunciones.size(); i++){
+		ArrayList<Id> listaVariablesDeFuncion = listaFunciones.get(i).getListaVariables();
+		for (int j = 0; j < listaVariablesDeFuncion.size(); j++){
+			cb.addQuadruples(listaVariablesDeFuncion.get(j).getIntermediateCode());
+		}
 		ArrayList<Sentencia> listaSentencias = listaFunciones.get(i).getListaSentencias();
 		for (int j = 0; j < listaSentencias.size(); j++){
 			cb.addQuadruples(listaSentencias.get(j).getIntermediateCode());
@@ -351,7 +358,14 @@ axiom1 ::= seccionVariables seccionFunciones:listaFunciones {:
 	| seccionFunciones:listaFunciones {:
 		IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeManager.getCurrentScope());
 		for (int i = 0; i < listaFunciones.size(); i++){
-			cb.addQuadruples(listaFunciones.get(i).getIntermediateCode());
+			ArrayList<Id> listaVariables = listaFunciones.get(i).getListaVariables();
+			for (int j = 0; j < listaVariables.size(); j++){
+				cb.addQuadruples(listaVariables.get(j).getIntermediateCode());
+			}
+			ArrayList<Sentencia> listaSentencias = listaFunciones.get(i).getListaSentencias();
+			for (int j = 0; j < listaSentencias.size(); j++){
+				cb.addQuadruples(listaSentencias.get(j).getIntermediateCode());
+			}
 		}
 		Axiom1 axiom = new Axiom1();
 		axiom.setIntermediateCode(cb.create());
@@ -396,14 +410,22 @@ tamTipo ::= NUMERO:n {:
 		RESULT = tamTipo;
 	:};
 
-seccionVariables ::= seccionVariables declaracionVariable
-	| declaracionVariable;
+seccionVariables ::= seccionVariables:listOfLists declaracionVariable:list {:
+	for (int i = 0; i < list.size(); i++){
+		listOfLists.add(list.get(i));
+	}
+	RESULT = listOfLists;
+:}
+	| declaracionVariable:list {:
+		RESULT = list;
+	:};
 
 declaracionVariable ::= ENTERO:identifier listadoIDs:list SEMI_COLON {:
 	for (int i = 0; i < list.size(); i++){
 		SymbolVariable newSymbol =	new SymbolVariable(scopeManager.getCurrentScope(), list.get(i).getName(), scopeManager.searchType("entero"));
 		scopeManager.getCurrentScope().getSymbolTable().addSymbol(newSymbol);
 	}
+	RESULT = list;
 :}
 	| IDENTIFICADOR:identifier listadoIDs:list SEMI_COLON {:
 		TypeIF type = checkIfExistsTypeWithinOpenScopes(identifier, true);
@@ -414,6 +436,7 @@ declaracionVariable ::= ENTERO:identifier listadoIDs:list SEMI_COLON {:
 			SymbolVariable newSymbol = new SymbolVariable(scopeManager.getCurrentScope(), list.get(i).getName(), type);
 			scopeManager.getCurrentScope().getSymbolTable().addSymbol(newSymbol);
 		}
+		RESULT = list;
 	:};
                       
 listadoIDs ::= id:fullDeclaration listadoIDs1:restOfDeclarations {:
@@ -432,6 +455,13 @@ listadoIDs1 ::= COLON listadoIDs:list {:
 id ::= IDENTIFICADOR:identifier id1:declaration {:
 	checkIfExistsSymbolWithinOpenScopes(identifier, false);
 	Id fullDeclaration = new Id (identifier.getLexema(), declaration.hasAssignmentValue(), declaration.getValue());
+	if (declaration.hasAssignmentValue()){
+		IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeManager.getCurrentScope());
+		TemporalFactoryIF tf = new TemporalFactory(scopeManager.getCurrentScope());
+		cb.addQuadruple("MV", new Variable (identifier.getLexema(), scopeManager.getCurrentScope()), new Value(declaration.getValue()));
+		fullDeclaration.setIntermediateCode(cb.create());
+		semanticErrorManager.semanticDebug("Codigo intermedio declaracionVariableInizializada " + identifier.getLexema() + " = " + declaration.getValue() + ": " + fullDeclaration.getIntermediateCode());
+	}
 	RESULT = fullDeclaration;
 :};
 
@@ -465,9 +495,8 @@ funcion ::= VACIO IDENTIFICADOR:identifier  OPEN_KEY seccionParametros:params CL
 		scopeManager.getCurrentScope().getSymbolTable().addSymbol(newSymbolParameter);
 	}
 :}
-	seccionTipos funcion1:list {:
-		checkIfReturnTypesMatch(list, "VACIO", Integer.toString(identifier.getLine()));
-		Funcion funcion = new Funcion(list);
+	seccionTipos funcion1:funcion {:
+		checkIfReturnTypesMatch(funcion.getListaSentencias(), "VACIO", Integer.toString(identifier.getLine()));
 		RESULT = funcion;
 	:}
 		| ENTERO IDENTIFICADOR:identifier  OPEN_KEY seccionParametros:params CLOSE_KEY OPEN_PARENTHESIS {:
@@ -481,21 +510,22 @@ funcion ::= VACIO IDENTIFICADOR:identifier  OPEN_KEY seccionParametros:params CL
 				scopeManager.getCurrentScope().getSymbolTable().addSymbol(newSymbolParameter);
 			}
 		:}
-			seccionTipos funcion1:list {:
-				checkIfReturnTypesMatch(list, "entero", Integer.toString(identifier.getLine()));
-				Funcion funcion = new Funcion(list);
+			seccionTipos funcion1:funcion {:
+				checkIfReturnTypesMatch(funcion.getListaSentencias(), "entero", Integer.toString(identifier.getLine()));
 				RESULT = funcion;
 			:};
                
 funcion1 ::= listadoSentencias:list CLOSE_PARENTHESIS:p {:
 	checkIfContainsReturn(list, Integer.toString(p.getLine()));
 	scopeManager.closeScope();
-	RESULT = list;
+	Funcion funcion1 = new Funcion(list, new ArrayList<Id>());
+	RESULT = funcion1;
 :}
-  | seccionVariables listadoSentencias:list CLOSE_PARENTHESIS:p {:
-		checkIfContainsReturn(list, Integer.toString(p.getLine()));
+  | seccionVariables:listOfVariables listadoSentencias:listOfSentencias CLOSE_PARENTHESIS:p {:
+		checkIfContainsReturn(listOfSentencias, Integer.toString(p.getLine()));
 		scopeManager.closeScope();
-		RESULT = list;
+		Funcion funcion1 = new Funcion(listOfSentencias, listOfVariables);
+		RESULT = funcion1;
 	:};
 
 seccionParametros ::= declaracionParametros:params {:
@@ -529,22 +559,23 @@ parametro ::= ENTERO IDENTIFICADOR:name {:
 funcionPrincipal ::= VACIO principal:p OPEN_KEY CLOSE_KEY OPEN_PARENTHESIS {:
 	scopeManager.openScope("main");
 :}
-	funcionPrincipal1:list {:
-		checkIfContainsReturn(list, Integer.toString(p.getLine()));
-		checkIfReturnTypesMatch(list, "VACIO", Integer.toString(p.getLine()));
+	funcionPrincipal1:funcion {:
+		checkIfContainsReturn(funcion.getListaSentencias(), Integer.toString(p.getLine()));
+		checkIfReturnTypesMatch(funcion.getListaSentencias(), "VACIO", Integer.toString(p.getLine()));
 		SymbolProcedure newSymbol = new SymbolProcedure(scopeManager.getCurrentScope(), p.getLexema(), scopeManager.searchType("vacio"), new ArrayList<Parametro>());
 		scopeManager.getCurrentScope().getSymbolTable().addSymbol(newSymbol);
-		Funcion funcion = new Funcion(list);
 		RESULT = funcion;
 	:};
 
-funcionPrincipal1 ::= seccionVariables listadoSentencias:list CLOSE_PARENTHESIS {:
+funcionPrincipal1 ::= seccionVariables:listaVariables listadoSentencias:listaSentencias CLOSE_PARENTHESIS {:
 	scopeManager.closeScope();
-	RESULT = list;
+	Funcion funcion = new Funcion (listaSentencias, listaVariables);
+	RESULT = funcion;
 :}
 	| listadoSentencias:list CLOSE_PARENTHESIS {:
 		scopeManager.closeScope();
-		RESULT = list;
+		Funcion funcion = new Funcion (list, new ArrayList<Id>());
+		RESULT = funcion;
 	:};
 
 
@@ -616,7 +647,7 @@ expresion ::= NUMERO:n {:
 						TemporalIF temp = tf.create();
 						Expresion e = new Expresion(scopeManager.searchType("entero"), subTipo, value);
 						cb.addQuadruples(a.getIntermediateCode());
-						cb.addQuadruple("ADD", temp, a.getTemporal(), 1);
+						cb.addQuadruple("INC", temp, a.getTemporal());
 						e.setTemporal(temp);
 						e.setIntermediateCode(cb.create());
 						semanticErrorManager.semanticDebug("Codigo intermedio autoincremento " + a.getValue() + "++: " + e.getIntermediateCode());

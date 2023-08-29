@@ -162,7 +162,7 @@ public class ExecutionEnvironmentEns2001
             case "CADENA":
                 b.append(operand1 + ": DATA " + result);
                 break;
-            case "VARGLOBAL":
+            case "VARSTATIC":
                 b.append("MOVE " + operand1 + ", " + result);
                 break;
             default:
