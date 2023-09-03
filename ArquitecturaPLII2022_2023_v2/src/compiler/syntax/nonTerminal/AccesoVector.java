@@ -2,11 +2,11 @@ package compiler.syntax.nonTerminal;
 
 public class AccesoVector extends NonTerminal {
     String name;
-    int value;
+    int index;
 
-    public AccesoVector (String name,  int value) {
+    public AccesoVector (String name,  int index) {
         this.name = name;
-        this.value = value;
+        this.index = index;
     }
     
     public String getName(){
@@ -14,6 +14,6 @@ public class AccesoVector extends NonTerminal {
     }
 
     public int getValue(){
-        return this.value;
+        return this.index;
     }
 }

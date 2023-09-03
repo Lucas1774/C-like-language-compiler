@@ -3,24 +3,41 @@
 
 vacio principal () {
 
-entero a;
-entero b;
-entero c;
+    entero a;
+    entero b;
+    entero c;
 
-a=5;
-b=3;
+    a=5;
+	escribe("a = 5?: ");
+	escribeEnt(a);
+	escribe();
 
-c = a < b;
+    b=3;
+	escribe("b = 3?: ");
+	escribeEnt(b);
+	escribe();
 
-escribe("c es 0");
-escribeEnt(c);
+    c = a < b;
+	escribe("c = 0?: ");
+	escribeEnt(c);
+	escribe();
 
-c = !(a == a);
+    c = !(a == b);
+	escribe("c = 1?: ");
+	escribeEnt(c);
+	escribe();
 
-escribe("c es 0");
-escribeEnt(c);
+    c= !(a < b);
+	escribe("c = 1?: ");
+	escribeEnt(c);
+	escribe();
+
+    c = a == b;
+	escribe("c = 0?: ");
+	escribeEnt(c);
+	escribe();
 
 
-devuelve;
+    devuelve;
 
 }

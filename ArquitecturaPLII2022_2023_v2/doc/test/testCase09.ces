@@ -5,15 +5,20 @@
 
 vacio principal () {
 
-entero a;
+    entero a;
 
-a = 1 && 0;
+    a = 2 && 0;
 
-escribe("a es 0");
-escribeEnt(a);
+	escribe("a = 0?: ");
+	escribeEnt(a);
+	escribe();
 
+    a = 2 && 1;
 
+	escribe("a = 1?: ");
+	escribeEnt(a);
+	escribe();
 
-devuelve;
+    devuelve;
 
 }

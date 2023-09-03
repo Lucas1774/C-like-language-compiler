@@ -12,6 +12,9 @@ import compiler.semantic.type.TypeSimple;
 import es.uned.lsi.compiler.code.ExecutionEnvironmentIF;
 import es.uned.lsi.compiler.code.MemoryDescriptorIF;
 import es.uned.lsi.compiler.code.RegisterDescriptorIF;
+import es.uned.lsi.compiler.intermediate.LabelFactory;
+import es.uned.lsi.compiler.intermediate.LabelFactoryIF;
+import es.uned.lsi.compiler.intermediate.LabelIF;
 import es.uned.lsi.compiler.intermediate.OperandIF;
 import es.uned.lsi.compiler.intermediate.QuadrupleIF;
 
@@ -113,37 +116,49 @@ public class ExecutionEnvironmentEns2001
                 b.append("MOVE " + ".A " + ", " + result);
                 break;
             case "MUL":
+                b.append("MUL " + operand1 + ", " + operand2 + "\n");
+                b.append("MOVE " + ".A " + ", " + result);
                 break;
             case "INC":
-                break;
-            case "NEG":
-                break;
-            case "EQ":
-                break;
-            case "LS":
+                b.append("INC " + result);
                 break;
             case "AND":
-                break;
-            case "NOT":
+                b.append("AND " + operand1 + ", " + operand2 + "\n");
+                b.append("MOVE " + ".A " + ", " + result);
                 break;
             case "BR":
+                b.append("BR /" + result);
                 break;
-            case "BRT":
+            case "BZ":
+                b.append("CMP " + operand1 + ", #0\n");
+                b.append("BZ /" + result);
                 break;
-            case "BRF":
+            case "BNZ":
+                b.append("CMP " + operand1 + ", #0\n");
+                b.append("BNZ /" + result);
+                break;
+            case "BP":
+                b.append("CMP " + operand1 + ", #0\n");
+                b.append("BP /" + result);
+                break;
+            case "BN":
+                b.append("CMP " + operand1 + ", #0\n");
+                b.append("BN /" + result );
                 break;
             case "INL":
+                b.append(result + ": NOP");
                 break;
             case "MV":
                 b.append("MOVE " + operand1 + ", " + result);
                 break;
-            case "MVA":
+            case "MVA": // move index
                 b.append("MOVE #" + operand1.replace("/", "") + ", " + result);
                 break;
-            case "MVP":
-                b.append("MOVE " + operand1 + ", " + result);
+            case "MVP": // move from index
+                b.append("MOVE " + operand1 + ", " + ".R1\n");
+                b.append("MOVE " + "[.R1]" + ", " + result);
                 break;
-            case "STP":
+            case "STP": // move to index
                 b.append("MOVE " + result + ", " + ".R1\n");
                 b.append("MOVE " + operand1 + ", " + "[.R1]");
                 break;
@@ -173,9 +188,7 @@ public class ExecutionEnvironmentEns2001
     }
 
     private boolean isStatic(Object operand) {
-        return operand instanceof Variable ? ((Variable)operand).getScope().getLevel() == 0 || ((Variable)operand).getScope().getName().equals("main") :
-        operand instanceof Temporal ? ((Temporal)operand).getScope().getLevel() == 0 || ((Temporal)operand).getScope().getName().equals("main") :
-        false;
+        return operand instanceof Variable || operand instanceof Temporal;
     }
 
     private String translateOperand (OperandIF operand) {
