@@ -6,11 +6,20 @@ public class Expresion<T> extends NonTerminal {
     private TypeIF type;
     private String subType;
     private T value;
+    private int index;
 
     public Expresion (TypeIF type, String subType, T value){
         this.type = type;
         this.subType = subType;
         this.value = value;
+    }
+
+    public void setIndex(int index){
+        this.index = index;
+    }
+
+    public int getIndex(){
+        return this.index;
     }
 
     public TypeIF getType(){

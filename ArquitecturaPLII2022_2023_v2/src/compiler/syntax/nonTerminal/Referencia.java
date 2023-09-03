@@ -1,6 +1,7 @@
 package compiler.syntax.nonTerminal;
 
-public class Referencia {
+
+public class Referencia extends NonTerminal{
     String name;
     String type;
     int index;

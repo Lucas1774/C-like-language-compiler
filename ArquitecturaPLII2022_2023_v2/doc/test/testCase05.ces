@@ -6,22 +6,28 @@ prueba de operadores
 
 vacio principal () {
 
-entero a;
-entero b;
-b = 19;
-a = b++;
-a= a+1+6*2;
+    entero a;
+    entero b;
+    b = 19;
+    escribe("b = 19?: ");
+    escribeEnt(b);
+    escribe();
 
-escribe("a");
-escribeEnt(a);
+    a = b++;
+    escribe("a = 20?: ");
+    escribeEnt(a);
+    escribe();
 
+    a= a+1+6*2;
+    escribe("a = 33?: ");
+    escribeEnt(a);
+    escribe();
 
-a = ((3+3)*2);
+    a = ((3+3)*2);
+    escribe("a = 12?: ");
+    escribeEnt(a);
+    escribe();
 
-escribe("asociacion parentesis");
-escribeEnt(a);
-
-
-devuelve;
+    devuelve;
 
 }
