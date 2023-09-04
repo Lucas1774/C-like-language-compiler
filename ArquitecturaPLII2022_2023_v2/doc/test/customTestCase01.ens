@@ -1,27 +1,172 @@
 ;Quadruple - [VARSTATIC z, 0, null]
-MOVE #0, /65533
+MOVE #0, /2
 
 ;Quadruple - [VARSTATIC x, 0, null]
-MOVE #0, /65535
+MOVE #0, /0
 
 ;Quadruple - [VARSTATIC y, 0, null]
-MOVE #0, /65534
+MOVE #0, /1
 
 ;Quadruple - [MV z, 1, null]
-MOVE #1, /65533
+MOVE #1, /2
 
-;Quadruple - [WRITESTRING T_0, L_0, null]
-WRSTR /L_0
+;Quadruple - [MV T_0, z, null]
+MOVE /2, /3
 
-;Quadruple - [MVP T_1, z, null]
-MOVE /65533, /65531
+;Quadruple - [MV T_1, 1, null]
+MOVE #1, /4
 
-;Quadruple - [WRITEINT T_1, null, null]
-WRINT /65531
+;Quadruple - [SUB T_2, T_1, T_0]
+SUB /4, /3
+MOVE .A , /5
+
+;Quadruple - [BZ L_0, T_2, null]
+CMP /5, #0
+BZ /L_0
+
+;Quadruple - [MV T_3, 0, null]
+MOVE #0, /6
+
+;Quadruple - [BR L_1, null, null]
+BR /L_1
+
+;Quadruple - [INL L_0, null, null]
+L_0: NOP
+
+;Quadruple - [MV T_3, 1, null]
+MOVE #1, /6
+
+;Quadruple - [INL L_1, null, null]
+L_1: NOP
+
+;Quadruple - [BZ L_3, T_3, null]
+CMP /6, #0
+BZ /L_3
+
+;Quadruple - [WRITESTRING T_0, L_2, null]
+WRSTR /L_2
+
+;Quadruple - [INL L_3, null, null]
+L_3: NOP
+
+;Quadruple - [MV T_4, z, null]
+MOVE /2, /7
+
+;Quadruple - [MV T_5, 1, null]
+MOVE #1, /8
+
+;Quadruple - [SUB T_6, T_5, T_4]
+SUB /8, /7
+MOVE .A , /9
+
+;Quadruple - [BZ L_4, T_6, null]
+CMP /9, #0
+BZ /L_4
+
+;Quadruple - [MV T_7, 0, null]
+MOVE #0, /10
+
+;Quadruple - [BR L_5, null, null]
+BR /L_5
+
+;Quadruple - [INL L_4, null, null]
+L_4: NOP
+
+;Quadruple - [MV T_7, 1, null]
+MOVE #1, /10
+
+;Quadruple - [INL L_5, null, null]
+L_5: NOP
+
+;Quadruple - [BZ L_6, T_7, null]
+CMP /10, #0
+BZ /L_6
+
+;Quadruple - [MV T_8, 0, null]
+MOVE #0, /11
+
+;Quadruple - [BR L_7, null, null]
+BR /L_7
+
+;Quadruple - [INL L_6, null, null]
+L_6: NOP
+
+;Quadruple - [MV T_8, 1, null]
+MOVE #1, /11
+
+;Quadruple - [INL L_7, null, null]
+L_7: NOP
+
+;Quadruple - [BZ L_9, T_8, null]
+CMP /11, #0
+BZ /L_9
+
+;Quadruple - [WRITESTRING T_0, L_8, null]
+WRSTR /L_8
+
+;Quadruple - [INL L_9, null, null]
+L_9: NOP
+
+;Quadruple - [MV T_9, z, null]
+MOVE /2, /12
+
+;Quadruple - [MV T_10, 1, null]
+MOVE #1, /13
+
+;Quadruple - [SUB T_11, T_10, T_9]
+SUB /13, /12
+MOVE .A , /14
+
+;Quadruple - [BZ L_10, T_11, null]
+CMP /14, #0
+BZ /L_10
+
+;Quadruple - [MV T_12, 0, null]
+MOVE #0, /15
+
+;Quadruple - [BR L_11, null, null]
+BR /L_11
+
+;Quadruple - [INL L_10, null, null]
+L_10: NOP
+
+;Quadruple - [MV T_12, 1, null]
+MOVE #1, /15
+
+;Quadruple - [INL L_11, null, null]
+L_11: NOP
+
+;Quadruple - [BZ L_15, T_12, null]
+CMP /15, #0
+BZ /L_15
+
+;Quadruple - [WRITESTRING T_0, L_12, null]
+WRSTR /L_12
+
+;Quadruple - [BR L_14, null, null]
+BR /L_14
+
+;Quadruple - [INL L_15, null, null]
+L_15: NOP
+
+;Quadruple - [WRITESTRING T_0, L_13, null]
+WRSTR /L_13
+
+;Quadruple - [INL L_14, null, null]
+L_14: NOP
 
 ;Quadruple - [HALT null, null, null]
 HALT
 
-;Quadruple - [CADENA "z = ", L_0, null]
-L_0: DATA "z = "
+;Quadruple - [CADENA "correcto", L_2, null]
+L_2: DATA "correcto"
+
+;Quadruple - [CADENA "error", L_8, null]
+L_8: DATA "error"
+
+;Quadruple - [CADENA "correcto", L_12, null]
+L_12: DATA "correcto"
+
+;Quadruple - [CADENA "error", L_13, null]
+L_13: DATA "error"
 

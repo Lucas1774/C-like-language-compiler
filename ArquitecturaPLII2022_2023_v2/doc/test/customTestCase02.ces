@@ -1,0 +1,13 @@
+
+vacio principal () {
+
+    entero y = 7;
+    entero z = 0;
+    
+    si (z == 0 && !y == z && (!(!y) && !z)) {
+        escribe ("correcto");
+    }sino {
+        escribe("error");
+    }
+    devuelve;
+}
