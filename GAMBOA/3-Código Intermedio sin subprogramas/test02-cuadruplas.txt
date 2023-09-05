@@ -1,0 +1,38 @@
+Codigo intermedio generado: [
+Quadruple - [MV T_3, 1000, null], 
+Quadruple - [MV T_2, 2, null], 
+Quadruple - [MVA T_1, V, null], 
+Quadruple - [SUB T_0, T_1, T_2], 
+Quadruple - [STP T_0, T_3, null], 
+
+Quadruple - [MV T_9, 2, null], 
+Quadruple - [MVA T_7, V, null], 
+Quadruple - [SUB T_8, T_7, T_9], 
+Quadruple - [MVP T_6, T_8, null], 
+Quadruple - [MVA T_5, B, null], 
+Quadruple - [STP T_5, T_6, null],
+ 
+Quadruple - [MV T_12, 133, null], 
+Quadruple - [MVA T_11, A, null], 
+Quadruple - [STP T_11, T_12, null], 
+
+Quadruple - [MVP T_17, A, null], 
+Quadruple - [MV T_16, 0, null], 
+Quadruple - [MVA T_15, V, null], 
+Quadruple - [SUB T_14, T_15, T_16], 
+Quadruple - [STP T_14, T_17, null],
+ 
+Quadruple - [WRITESTRING T_18, L_0, null],
+ 
+Quadruple - [MV T_22, 0, null], 
+Quadruple - [MVA T_20, V, null], 
+Quadruple - [SUB T_21, T_20, T_22], 
+Quadruple - [MVP T_19, T_21, null], 
+Quadruple - [WRITEINT T_19, null, null],
+ 
+Quadruple - [WRITELN null, null, null], 
+
+Quadruple - [CADENA "V[1] = ", L_0, null]
+]
+
+

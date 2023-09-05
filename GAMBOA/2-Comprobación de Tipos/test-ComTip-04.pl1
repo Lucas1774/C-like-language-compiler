@@ -1,0 +1,36 @@
+# Ejemplo -- subprogramas paso de parametros -- comprobacion de tipos de la sentencia devolver
+
+programa ejemplo:
+
+	variables
+		a,b,c : entero;
+		v,f : booleano;
+	
+	subprogramas
+		procedimiento imprimir (a : entero):
+		comienzo
+			escribir(a);			
+		fin; 
+	
+	funcion sumar (var a:entero; b: entero): entero:
+		variables
+			x : entero;
+		comienzo
+			x = a + b;		
+			devolver x;
+		fin;			   
+		
+comienzo
+  	imprimir (12); 
+    c = sumar(a, b);
+   	imprimir(sumar(a, b));
+	
+	# las siguientes sentencias no son compatibles en cuanto a tipos o número de parámetros o invocacion.
+	# v = sumar(a, b);
+	# c = sumar(a, v);
+	# c = sumar(12, 12);
+	# c = sumar(a);
+	# imprimir (12, 5); 
+	# sumar(a,b);
+	# v = imprimir(12);
+fin.

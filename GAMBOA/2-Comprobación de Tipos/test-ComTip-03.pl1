@@ -1,0 +1,45 @@
+# Ejemplo -- sentencia devolver en sentencias si-sino y para 
+
+programa ejemplo:
+	variables
+		abierto, cerrado : booleano;
+		x, z : entero;
+	
+	subprogramas
+		funcion comparar (a,b:entero): booleano:
+			
+		comienzo
+			
+			si (a < b) entonces:
+				escribir ("a es menor que b");
+				devolver cierto;  # al comentar esta línea y teniendo la linea 21 comentada debería dar error al faltar la sentcia devolver.
+			sino:
+				escribir ("b es menor o igual que a");
+				devolver falso;  # al comentar esta línea y teniendo la linea 21 comentada debería dar error al faltar la sentcia devolver.
+			fin si;	
+			
+			# devolver falso;	# descomentando esta línea y teniendo comentada la linea 18 y/o 15 no debería dar error.
+			
+		fin;
+		
+		funcion incrementar (var a:entero): entero:
+			variables
+				i : entero;
+		comienzo
+			
+			para i en 1..5: 
+				si (i < 3) entonces:
+					devolver i+1;
+				sino:
+					devolver i+i;
+				fin si;
+				devolver i+1;
+			fin para;
+			devolver i+1;  # al comentar esta linea deberia dar error, dado que el bucle para prodria nunca ejecutarse
+			
+		fin;
+
+comienzo
+	abierto = comparar(x,z);
+	z = incrementar(x);
+fin.

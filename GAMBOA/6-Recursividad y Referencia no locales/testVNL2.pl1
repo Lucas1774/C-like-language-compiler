@@ -1,0 +1,26 @@
+# Ejemplo generacion codigo intermedio y final - Referencias no locales
+
+programa testReferenciasNoLocales:
+  variables a1,b1,suma : entero;
+  subprogramas
+  procedimiento Sumar (VAR a:entero; VAR b:entero):
+	variables s : entero;
+	subprogramas
+	procedimiento imprimir():
+		comienzo
+		    s = 105;
+			s = s + 1;  # traducida mediante INC (S);
+			escribir("Suma(106):");
+			escribir(s);
+		fin; 
+  	
+	comienzo
+		s = a+b;
+		imprimir();
+ 	fin; 	
+  
+ comienzo
+    a1 = 2;
+	b1 = 3;
+    Sumar(a1,b1);
+ fin.

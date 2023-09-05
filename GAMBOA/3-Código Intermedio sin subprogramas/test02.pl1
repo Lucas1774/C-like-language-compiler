@@ -1,0 +1,21 @@
+# Ejemplo generacion codigo intermedio
+
+programa Ejemplo:
+	
+	tipos
+		tvector = vector [1..5] de entero;
+	variables
+		v : tvector;
+		a,b: entero;	
+
+comienzo
+	v[3] = 1000;
+	b = v[3];
+	
+	a = 133;
+	v[1] = a;	
+	
+	escribir("v[1] = ");
+	escribir(v[1]);
+	escribir();
+fin.

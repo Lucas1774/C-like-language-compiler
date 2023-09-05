@@ -1,0 +1,45 @@
+# Ejemplo subprogramas paso de un vector por refencia
+
+programa ejemplo:
+	constantes
+		A = 10;
+		B = 20;
+		
+	tipos
+		Mivector = vector[1..5] de entero;
+	
+	variables
+		abierto, cerrado : booleano;
+		x, z : entero;
+		v1 : Mivector;
+	
+	subprogramas
+		funcion comparar (var a:Mivector; c:entero): booleano:
+			
+		comienzo
+			
+			si (a[3] < c) entonces:
+				escribir ("la posicion del vector es menor");
+				devolver (a[3] < c);
+			sino:
+				escribir ("la posicion del vector es mayor");
+				devolver (a[3] < c);
+			fin si;			
+		fin;
+		
+		procedimiento incrementar (var a:Mivector;):
+			variables
+				i : entero;
+		comienzo
+			
+			para i en 1..v1[3]:
+				escribir(a[i]);
+			fin para;
+		fin;
+
+comienzo
+	abierto = comparar(V1,A);
+	# abierto = comparar(V1,V1); # Error al tratar de pasar una variable de tipo vector como parametro por valor
+	incrementar(v1);
+	# incrementar(x);  # Error al tratar de pasar una variable de tipo entero en lugar de una de tipo Mivector
+fin.
