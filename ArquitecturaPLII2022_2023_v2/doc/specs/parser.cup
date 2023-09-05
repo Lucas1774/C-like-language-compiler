@@ -1133,7 +1133,14 @@ casoAlt ::= CASO NUMERO:n TWO_POINTS bloque:b CORTE SEMI_COLON {:
 porDefecto ::= PORDEFECTO TWO_POINTS bloque:b CORTE SEMI_COLON {:
 	IntermediateCodeBuilder cb= new IntermediateCodeBuilder(scopeManager.getCurrentScope());
 	CasoAlt casoAlt = new CasoAlt("PORDEFECTO");
-	cb.addQuadruples(b.getIntermediateCode());
+	ArrayList<Id> listaVariables = b.getListaVariables();
+	for (int i = 0; i < listaVariables.size(); i++){
+		cb.addQuadruples(listaVariables.get(i).getIntermediateCode());
+	}
+	ArrayList<Sentencia> listaSentencias = b.getListaSentencias();
+	for (int i = 0; i < listaSentencias.size(); i++){
+		cb.addQuadruples(listaSentencias.get(i).getIntermediateCode());
+	}
 	casoAlt.setIntermediateCode(cb.create());
 	semanticErrorManager.semanticDebug("Codigo intermedio default: " + casoAlt.getIntermediateCode());
 	RESULT = casoAlt;

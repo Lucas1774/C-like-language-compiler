@@ -6,6 +6,14 @@
 vacio principal () {
 
     entero a;
+    entero y = 7;
+    entero z = 0;
+    
+    si (z == 0 && !y == z && (!(!y) && !z)) {
+        escribe ("correcto");
+    }sino {
+        escribe("error");
+    }
 
     a = 2 && 0;
 
