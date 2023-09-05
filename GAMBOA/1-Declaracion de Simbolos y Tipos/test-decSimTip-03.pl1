@@ -1,0 +1,33 @@
+# Listado 20. Ejemplo de un programa PL1UnedES
+
+programa Ejemplo:
+	constantes MAX = 10;
+
+	tipos	Mivector = vector [1..MAX] de entero;
+		
+	variables	i : entero;
+				x : booleano;
+				v1 : Mivector;
+				
+	subprogramas
+	
+		funcion EsMenorQueDos (a:entero): booleano:
+			variables 	dos : entero;
+						result : entero;
+						esMenor : booleano;
+						
+			subprogramas
+				procedimiento Imprime (numero:entero):
+				comienzo
+					escribir("Procedimiento de ambito de nivel 2");
+				fin;
+		comienzo
+			escribir("Funcion de ambito de nivel 1");
+		fin;
+
+comienzo
+	escribir("hola");
+	escribir();			
+	escribir("mundo");
+fin.
+

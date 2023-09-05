@@ -1,0 +1,134 @@
+;Quadruple - [STARTGLOBAL null, null, null]
+MOVE .SP, .IX
+PUSH #-1
+PUSH .IX
+PUSH .SR
+PUSH .IX
+;Quadruple - [VARGLOBAL X, 0, null]
+PUSH #0
+;Quadruple - [VARGLOBAL Z, 0, null]
+PUSH #0
+;Quadruple - [PUNTEROGLOBAL T_15, 24, null]
+SUB .IX, #24
+MOVE .A, .SP
+;Quadruple - [MV T_1, 66, null]
+MOVE #66, #-7[.IX]
+;Quadruple - [MVA T_0, Z, null]
+SUB .IX, #5
+MOVE .A, #-6[.IX]
+;Quadruple - [STP T_0, T_1, null]
+MOVE #-6[.IX], .R1
+MOVE #-7[.IX], [.R1]
+;Quadruple - [MV T_4, 1, null]
+MOVE #1, #-10[.IX]
+;Quadruple - [MVA T_3, X, null]
+SUB .IX, #4
+MOVE .A, #-9[.IX]
+;Quadruple - [STP T_3, T_4, null]
+MOVE #-9[.IX], .R1
+MOVE #-10[.IX], [.R1]
+;Quadruple - [STARTSUBPROGRAMA null, null, null]
+MOVE .SP, .R0
+PUSH #-1
+PUSH .R0
+PUSH .SR
+PUSH .IX
+;Quadruple - [MVA T_7, Z, null]
+SUB .IX, #5
+MOVE .A, #-13[.IX]
+;Quadruple - [PARAM T_7, null, null]
+PUSH #-13[.IX]
+;Quadruple - [MVP T_8, X, null]
+MOVE #-4[.IX], #-14[.IX]
+;Quadruple - [PARAM T_8, null, null]
+PUSH #-14[.IX]
+;Quadruple - [CALL L_INCREMENTAR, null, null]
+MOVE .R0, .IX
+CALL /L_INCREMENTAR
+MOVE .IX, .SP
+MOVE #0[.IX], .R9
+MOVE #-3[.IX], .R0
+MOVE .R0, .IX
+;Quadruple - [VALORRETORNO T_9, null, null]
+MOVE .R9, #-15[.IX]
+;Quadruple - [MVA T_6, X, null]
+SUB .IX, #4
+MOVE .A, #-12[.IX]
+;Quadruple - [STP T_6, T_9, null]
+MOVE #-12[.IX], .R1
+MOVE #-15[.IX], [.R1]
+;Quadruple - [WRITESTRING T_11, L_5, null]
+WRSTR /L_5
+;Quadruple - [MVP T_12, X, null]
+MOVE #-4[.IX], #-18[.IX]
+;Quadruple - [WRITEINT T_12, null, null]
+WRINT #-18[.IX]
+;Quadruple - [WRITELN null, null, null]
+WRCHAR #10
+;Quadruple - [WRITESTRING T_13, L_6, null]
+WRSTR /L_6
+;Quadruple - [MVP T_14, Z, null]
+MOVE #-5[.IX], #-20[.IX]
+;Quadruple - [WRITEINT T_14, null, null]
+WRINT #-20[.IX]
+;Quadruple - [WRITELN null, null, null]
+WRCHAR #10
+;Quadruple - [HALT null, null, null]
+HALT
+;Quadruple - [ETIQUETA L_INCREMENTAR, null, null]
+L_INCREMENTAR : NOP 
+;Quadruple - [VARSUBPROGRAMA J, 0, null]
+PUSH #0
+;Quadruple - [PUNTEROSUBPROGRAMA T_13, 22, null]
+SUB .IX, #22
+MOVE .A, .SP
+;Quadruple - [WRITESTRING T_0, L_0, null]
+WRSTR /L_0
+;Quadruple - [MVP T_1, B, null]
+MOVE #-5[.IX], #-9[.IX]
+;Quadruple - [WRITEINT T_1, null, null]
+WRINT #-9[.IX]
+;Quadruple - [WRITELN null, null, null]
+WRCHAR #10
+;Quadruple - [MVP T_3, A, null]
+MOVE #-4[.IX], .R1
+MOVE [.R1], #-11[.IX]
+;Quadruple - [MVP T_4, B, null]
+MOVE #-5[.IX], #-12[.IX]
+;Quadruple - [ADD T_5, T_3, T_4]
+ADD #-11[.IX], #-12[.IX]
+MOVE .A , #-13[.IX]
+;Quadruple - [MVA T_2, J, null]
+SUB .IX, #7
+MOVE .A, #-10[.IX]
+;Quadruple - [STP T_2, T_5, null]
+MOVE #-10[.IX], .R1
+MOVE #-13[.IX], [.R1]
+;Quadruple - [MVP T_9, J, null]
+MOVE #-7[.IX], #-17[.IX]
+;Quadruple - [MV T_8, 133, null]
+MOVE #133, #-16[.IX]
+;Quadruple - [ADD T_10, T_9, T_8]
+ADD #-17[.IX], #-16[.IX]
+MOVE .A , #-18[.IX]
+;Quadruple - [MVA T_7, A, null]
+MOVE #-4[.IX], #-15[.IX]
+;Quadruple - [STP T_7, T_10, null]
+MOVE #-15[.IX], .R1
+MOVE #-18[.IX], [.R1]
+;Quadruple - [MVP T_12, J, null]
+MOVE #-7[.IX], #-20[.IX]
+;Quadruple - [RETURN L_FIN_INCREMENTAR, T_12, null]
+MOVE #-20[.IX], #0[.IX]
+BR /L_FIN_INCREMENTAR
+;Quadruple - [FINSUBPROGRAMA L_FIN_INCREMENTAR, 7, null]
+L_FIN_INCREMENTAR : NOP 
+SUB .IX, #7
+MOVE .A, .SP
+RET
+;Quadruple - [CADENA "B(1) ", L_0, null]
+L_0 : DATA "B(1) " 
+;Quadruple - [CADENA "X(67)= ", L_5, null]
+L_5 : DATA "X(67)= " 
+;Quadruple - [CADENA "Z(200)= ", L_6, null]
+L_6 : DATA "Z(200)= " 

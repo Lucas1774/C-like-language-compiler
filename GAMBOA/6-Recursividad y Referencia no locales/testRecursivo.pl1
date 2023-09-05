@@ -1,0 +1,30 @@
+# Ejemplo generacion codigo intermedio y final - Recursividad
+
+programa testRecursividad:
+  variables a : entero;
+  subprogramas
+  procedimiento comparar (VAR x:entero):
+	comienzo
+		escribir("x:");
+		escribir(x);
+		escribir();
+		si x<5 entonces:
+			x = x+1;
+			escribir("x+1:");
+			escribir(x);
+			escribir();
+			comparar(x);
+		sino:
+			x = 5;
+		fin si;
+		escribir("Salir subprograma");
+		escribir();
+ 	fin; 	
+  
+ comienzo
+    a = 1;
+	comparar(a);
+	escribir("a:");
+	escribir(a);
+	escribir();
+ fin.

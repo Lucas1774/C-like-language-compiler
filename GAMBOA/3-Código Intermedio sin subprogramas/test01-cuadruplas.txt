@@ -1,0 +1,23 @@
+Codigo intermedio generado: [
+Quadruple - [MV T_1, 2, null], 
+Quadruple - [MVA T_0, X, null], 
+Quadruple - [STP T_0, T_1, null],
+ 
+Quadruple - [MV T_4, 3, null], 
+Quadruple - [MVA T_3, Z, null], 
+Quadruple - [STP T_3, T_4, null],
+ 
+Quadruple - [MVP T_7, X, null], 
+Quadruple - [MVP T_8, Z, null], 
+Quadruple - [ADD T_9, T_7, T_8], 
+Quadruple - [MVA T_6, SUMA, null], 
+Quadruple - [STP T_6, T_9, null], 
+
+Quadruple - [WRITESTRING T_11, L_0, null], 
+
+Quadruple - [MVP T_12, SUMA, null], 
+Quadruple - [WRITEINT T_12, null, null], 
+
+Quadruple - [WRITELN null, null, null], 
+Quadruple - [CADENA "SUMA = ", L_0, null]
+]

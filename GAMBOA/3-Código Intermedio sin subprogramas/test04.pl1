@@ -1,0 +1,14 @@
+# Ejemplo generacion codigo intermedio
+
+programa Ejemplo:
+	
+	variables
+		i : entero;	
+
+comienzo
+	
+	para i en 0 .. 5:
+		escribir(i);
+	fin para;
+	
+fin.

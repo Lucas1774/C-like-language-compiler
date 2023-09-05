@@ -1,0 +1,27 @@
+# Ejemplo declaracion de constantes, tipos compuestos y variables
+programa test:
+	constantes
+		a = 10;
+		b = 20;
+		c = cierto;
+		MIN = 1;
+		
+	tipos
+		TipoVectorEnteros = vector [1..3] de entero;
+		TipoVectorBooleanos = vector [MIN..50] de booleano;
+		# TipoVectorBooleanos = vector [1..100] de entero; # debe de emitirse un error semantico por eqivalencia nominal de tipos en la pila de ambitos abiertos
+		# a = vector [1..10] de entero; # debe de emitirse un error semantico por identificador de un tipo ya declarado en la tabla de simbolos
+		 
+	variables
+		abierto : booleano;
+		x, z : entero;
+		v1, v2 : TipoVectorEnteros;
+		# A : TipoVectorBooleanos; # debe de emitirse un error semantico por simbolo ya declarado
+		# ABIERTO : entero; # debe de emitirse un error semantico por simbolo ya declarado
+		# TipoVectorBooleanos : booleano # debe de emitirse un error semantico por identificador de un simbolo ya declarado en la tabla de tipos
+
+comienzo
+	escribir("hola");
+	escribir();			
+	escribir("mundo");
+fin.

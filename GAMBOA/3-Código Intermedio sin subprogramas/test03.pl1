@@ -1,0 +1,19 @@
+# Ejemplo generacion codigo intermedio
+
+programa Ejemplo:
+	
+	variables
+		x, z : entero;	
+
+comienzo
+	x = 2;
+	z = 3;
+	
+	si x == z entonces:
+		escribir("z es mayor que x");
+	sino:
+		escribir("x es mayor o igual que z");
+	fin si;
+	
+	escribir();
+fin.

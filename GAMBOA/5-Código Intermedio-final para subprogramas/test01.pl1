@@ -1,0 +1,21 @@
+# Ejemplo generacion codigo intermedio y final invocando un subprograma
+
+programa test:
+  variables z : entero;
+  subprogramas
+  procedimiento incrementar (x:entero):
+  	variables a: entero;
+ 	comienzo
+	    a = x + 1;
+ 		escribir("a(4)= ");
+		escribir(a);
+		escribir();
+ 	fin; 	
+  comienzo
+	escribir("*** INVOCACION DE SUBPROGRAMAS ***");
+	escribir();
+    z = 3;
+	incrementar(z);
+    escribir("FIN");
+	escribir();
+ fin.
