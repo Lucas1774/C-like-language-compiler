@@ -12,6 +12,21 @@ vacio principal () {
 	entero a;
 	entero b;
 	entero dia;
+    entero z = 1;
+
+    si (z == 1) {
+        escribe ("correcto");
+    }
+    si (!(z == 1)) {
+        escribe("error");
+    }
+
+    si (z == 1) {
+        escribe ("correcto");
+    }
+    sino {
+        escribe("error");
+    }
 
 	a=2;
 	escribe("a = 2?: ");
@@ -116,10 +131,18 @@ vacio principal () {
 	dia = 2;
 	alternativas (dia) {
 
-		caso 1: {escribe ("lunes");} corte;
-		caso 2: {escribe ("martes");} corte;
-		caso 3: {escribe ("miercoles");} corte;	
+		caso 1: {escribe ("error");} corte;
+		caso 2: {escribe ("correcto");} corte;
+		caso 3: {escribe ("error");} corte;	
 		caso 4: {escribe ("error");} corte;
+		pordefecto: {escribe ("error");} corte;
+	}
+	alternativas (dia) {
+
+		caso 1: {escribe ("error");} corte;
+		caso 3: {escribe ("error");} corte;	
+		caso 4: {escribe ("error");} corte;
+		pordefecto: {escribe ("correcto");} corte;
 	}
 
 
