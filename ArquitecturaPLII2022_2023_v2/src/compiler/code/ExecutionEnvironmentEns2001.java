@@ -3,11 +3,19 @@ package compiler.code;
 import java.util.Arrays;
 import java.util.List;
 
+import compiler.intermediate.Label;
+import compiler.intermediate.Temporal;
+import compiler.intermediate.Value;
+import compiler.intermediate.Variable;
 import compiler.semantic.type.TypeSimple;
 
 import es.uned.lsi.compiler.code.ExecutionEnvironmentIF;
 import es.uned.lsi.compiler.code.MemoryDescriptorIF;
 import es.uned.lsi.compiler.code.RegisterDescriptorIF;
+import es.uned.lsi.compiler.intermediate.LabelFactory;
+import es.uned.lsi.compiler.intermediate.LabelFactoryIF;
+import es.uned.lsi.compiler.intermediate.LabelIF;
+import es.uned.lsi.compiler.intermediate.OperandIF;
 import es.uned.lsi.compiler.intermediate.QuadrupleIF;
 
 /**
@@ -92,8 +100,109 @@ public class ExecutionEnvironmentEns2001
      */
     @Override
     public final String translate (QuadrupleIF quadruple)
-    {      
-        //TODO: Student work
-        return quadruple.toString(); 
+    {
+        StringBuffer b = new StringBuffer();
+        String operand1 = translateOperand(quadruple.getFirstOperand());
+        String operand2 = translateOperand(quadruple.getSecondOperand());
+        String result = translateOperand(quadruple.getResult());
+        b.append(";" + quadruple.toString() + "\n"); // quadrupla en string para debug. ENS la ignora
+        switch (quadruple.getOperation()){
+            case "ADD":
+                b.append("ADD " + operand1 + ", " + operand2 + "\n");
+                b.append("MOVE " + ".A " + ", " + result);
+                break;
+            case "SUB":
+                b.append("SUB " + operand1 + ", " + operand2 + "\n");
+                b.append("MOVE " + ".A " + ", " + result);
+                break;
+            case "MUL":
+                b.append("MUL " + operand1 + ", " + operand2 + "\n");
+                b.append("MOVE " + ".A " + ", " + result);
+                break;
+            case "INC":
+                b.append("INC " + result);
+                break;
+            case "AND":
+                b.append("AND " + operand1 + ", " + operand2 + "\n");
+                b.append("MOVE " + ".A " + ", " + result);
+                break;
+            case "BR":
+                b.append("BR /" + result);
+                break;
+            case "BZ":
+                b.append("CMP " + operand1 + ", #0\n");
+                b.append("BZ /" + result);
+                break;
+            case "BNZ":
+                b.append("CMP " + operand1 + ", #0\n");
+                b.append("BNZ /" + result);
+                break;
+            case "BP":
+                b.append("CMP " + operand1 + ", #0\n");
+                b.append("BP /" + result);
+                break;
+            case "BN":
+                b.append("CMP " + operand1 + ", #0\n");
+                b.append("BN /" + result );
+                break;
+            case "INL":
+                b.append(result + ": NOP");
+                break;
+            case "MV":
+                b.append("MOVE " + operand1 + ", " + result);
+                break;
+            case "MVA": // move index
+                b.append("MOVE #" + operand1.replace("/", "") + ", " + result);
+                break;
+            case "MVP": // move from index
+                b.append("MOVE " + operand1 + ", " + ".R1\n");
+                b.append("MOVE " + "[.R1]" + ", " + result);
+                break;
+            case "STP": // move to index
+                b.append("MOVE " + result + ", " + ".R1\n");
+                b.append("MOVE " + operand1 + ", " + "[.R1]");
+                break;
+            case "HALT":
+                b.append("HALT");
+                break;
+            case "WRITESTRING":
+                b.append("WRSTR /" + operand1);
+                break;
+            case "WRITEINT":
+                b.append("WRINT " + result);
+                break;
+            case "WRITEEMPTY":
+                b.append("WRCHAR #10");
+                break;
+            case "CADENA":
+                b.append(operand1 + ": DATA " + result);
+                break;
+            case "VARSTATIC":
+                b.append("MOVE " + operand1 + ", " + result);
+                break;
+            default:
+                break;
+        }
+        b.append("\n");
+        return b.toString(); 
+    }
+
+    private boolean isStatic(Object operand) {
+        return operand instanceof Variable || operand instanceof Temporal;
+    }
+
+    private String translateOperand (OperandIF operand) {
+        if (operand instanceof Variable) {
+            return isStatic((Variable)operand) ? "/" + ((Variable)operand).getAddress() :
+            "#-" + ((Variable)operand).getAddress() + "[.IX]";
+        } else if (operand instanceof Temporal){
+            return isStatic ((Temporal)operand) ? "/" + ((Temporal)operand).getAddress() :
+            "#-" + ((Temporal)operand).getAddress() + "[.IX]";
+        } else if (operand instanceof Value){ 
+            return "#" + ((Value)operand).getValue();
+        } else if (operand instanceof Label){
+            return ((Label)operand).getName();
+        }
+        return null;
     }
 }

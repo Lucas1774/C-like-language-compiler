@@ -7,7 +7,7 @@ import es.uned.lsi.compiler.semantic.type.TypeBase;
  * Class for TypePointer.
  */
 
-// TODO: Student work
+// Student work
 //       Include properties to characterize pointer type
 
 public class TypePointer
@@ -40,7 +40,7 @@ public class TypePointer
     @Override
     public int getSize ()
     {
-        // TODO: Student work
+        // Student work
         return 1;
     }
 }

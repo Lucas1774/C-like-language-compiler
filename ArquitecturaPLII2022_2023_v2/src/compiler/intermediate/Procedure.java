@@ -53,7 +53,7 @@ public class Procedure
     @Override
     public final LabelIF getCodeLabel ()
     {
-        // TODO : Student Work
+        // Student work
         return null;
     }
 

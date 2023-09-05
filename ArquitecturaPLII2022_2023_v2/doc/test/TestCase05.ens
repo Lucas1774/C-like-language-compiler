@@ -1,0 +1,150 @@
+;Quadruple - [VARSTATIC a, 0, null]
+MOVE #0, /0
+
+;Quadruple - [VARSTATIC b, 0, null]
+MOVE #0, /1
+
+;Quadruple - [MV T_0, 19, null]
+MOVE #19, /2
+
+;Quadruple - [MVA T_1, b, null]
+MOVE #1, /3
+
+;Quadruple - [STP T_1, T_0, null]
+MOVE /3, .R1
+MOVE /2, [.R1]
+
+;Quadruple - [WRITESTRING T_2, L_0, null]
+WRSTR /L_0
+
+;Quadruple - [MV T_3, b, null]
+MOVE /1, /5
+
+;Quadruple - [WRITEINT T_3, null, null]
+WRINT /5
+
+;Quadruple - [WRITEEMPTY null, null, null]
+WRCHAR #10
+
+;Quadruple - [MV T_4, b, null]
+MOVE /1, /6
+
+;Quadruple - [INC T_4, null, null]
+INC /6
+
+;Quadruple - [MV T_5, T_4, null]
+MOVE /6, /7
+
+;Quadruple - [MVA T_6, a, null]
+MOVE #0, /8
+
+;Quadruple - [STP T_6, T_5, null]
+MOVE /8, .R1
+MOVE /7, [.R1]
+
+;Quadruple - [WRITESTRING T_7, L_1, null]
+WRSTR /L_1
+
+;Quadruple - [MV T_8, a, null]
+MOVE /0, /10
+
+;Quadruple - [WRITEINT T_8, null, null]
+WRINT /10
+
+;Quadruple - [WRITEEMPTY null, null, null]
+WRCHAR #10
+
+;Quadruple - [MV T_9, a, null]
+MOVE /0, /11
+
+;Quadruple - [MV T_10, 1, null]
+MOVE #1, /12
+
+;Quadruple - [ADD T_11, T_9, T_10]
+ADD /11, /12
+MOVE .A , /13
+
+;Quadruple - [MV T_12, 6, null]
+MOVE #6, /14
+
+;Quadruple - [MV T_13, 2, null]
+MOVE #2, /15
+
+;Quadruple - [MUL T_14, T_12, T_13]
+MUL /14, /15
+MOVE .A , /16
+
+;Quadruple - [ADD T_15, T_11, T_14]
+ADD /13, /16
+MOVE .A , /17
+
+;Quadruple - [MVA T_16, a, null]
+MOVE #0, /18
+
+;Quadruple - [STP T_16, T_15, null]
+MOVE /18, .R1
+MOVE /17, [.R1]
+
+;Quadruple - [WRITESTRING T_17, L_2, null]
+WRSTR /L_2
+
+;Quadruple - [MV T_18, a, null]
+MOVE /0, /20
+
+;Quadruple - [WRITEINT T_18, null, null]
+WRINT /20
+
+;Quadruple - [WRITEEMPTY null, null, null]
+WRCHAR #10
+
+;Quadruple - [MV T_19, 3, null]
+MOVE #3, /21
+
+;Quadruple - [MV T_20, 3, null]
+MOVE #3, /22
+
+;Quadruple - [ADD T_21, T_19, T_20]
+ADD /21, /22
+MOVE .A , /23
+
+;Quadruple - [MV T_22, 2, null]
+MOVE #2, /24
+
+;Quadruple - [MUL T_23, T_21, T_22]
+MUL /23, /24
+MOVE .A , /25
+
+;Quadruple - [MVA T_24, a, null]
+MOVE #0, /26
+
+;Quadruple - [STP T_24, T_23, null]
+MOVE /26, .R1
+MOVE /25, [.R1]
+
+;Quadruple - [WRITESTRING T_25, L_3, null]
+WRSTR /L_3
+
+;Quadruple - [MV T_26, a, null]
+MOVE /0, /28
+
+;Quadruple - [WRITEINT T_26, null, null]
+WRINT /28
+
+;Quadruple - [WRITEEMPTY null, null, null]
+WRCHAR #10
+
+;Quadruple - [HALT null, null, null]
+HALT
+
+;Quadruple - [CADENA "b = 19?: ", L_0, null]
+L_0: DATA "b = 19?: "
+
+;Quadruple - [CADENA "a = 20?: ", L_1, null]
+L_1: DATA "a = 20?: "
+
+;Quadruple - [CADENA "a = 33?: ", L_2, null]
+L_2: DATA "a = 33?: "
+
+;Quadruple - [CADENA "a = 12?: ", L_3, null]
+L_3: DATA "a = 12?: "
+

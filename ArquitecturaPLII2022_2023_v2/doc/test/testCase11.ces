@@ -1,7 +1,7 @@
 
 /* 
 
- Creaci—n y acceso datos complejos, vectores
+ Creaciï¿½n y acceso datos complejos, vectores
 
 */
 
@@ -14,12 +14,33 @@ entero c;
 
 v1[1] = 7;
 
-escribe("v1");
+escribe("v1[1] = 7 ?:");
 escribeEnt(v1[1]);
+escribe();
 
-c = v1[1] + v[v[2]];
+v1[0] = 3;
+v1[2] = 0;
+
+escribe("v1[0] = 3 ?:");
+escribeEnt(v1[0]);
+escribe();
+
+escribe("v1[2] = 0 ?:");
+escribeEnt(v1[2]);
+escribe();
+
+
+escribe("v1[v1[2]] = 3 ?:");
+escribeEnt(v1[v1[2]]);
+escribe();
+
+c = v1[1] + v1[v1[2]];
 
 escribeEnt(c);
+
+escribe("c = 10 ?: ");
+escribeEnt(c);
+escribe();
 
 devuelve;
 

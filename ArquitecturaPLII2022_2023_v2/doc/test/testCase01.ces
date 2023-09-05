@@ -1,5 +1,6 @@
 vacio principal () {
 
+resta();
 devuelve;
 
 }

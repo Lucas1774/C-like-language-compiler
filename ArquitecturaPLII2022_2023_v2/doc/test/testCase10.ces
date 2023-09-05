@@ -4,50 +4,53 @@
 // Flujo combinadas (si para) y bloques
 */
 
-entero suma (entero x, entero y) {
-
-	devuelve x+y;
-
-}
-
 vacio principal () {
 
-entero a;
-entero b;
-entero uno;
+	entero a;
+	entero b;
+	entero uno;
 
-a=0;
-b=5;
-uno=1;
+	a=0;
+	escribe("a = 0?: ");
+	escribeEnt(a);
+	escribe();
 
-mientras (a<5) {
-
-	si (b<7) {
-		escribe("b");
-		escribeEnt(b);
-	}
-
-	escribe("a");
-	escribeEnt(a);	
-	b = suma (b,uno);
-	a++;
-
-}
-
-/* bloque */
-{
-
-	entero c;
-	{
-		c=1;
-		escribe("c");
-		escribeEnt(c);
+	b=5;
+	escribe("b = 5?: ");
+	escribeEnt(b);
+	escribe();
 	
+	uno=1;
+
+	escribe("uno = 1?: ");
+	escribeEnt(uno);
+	escribe();
+
+	mientras (a<5) {
+
+		si (b<7) {
+			escribe("b < 7: ");
+			escribeEnt(b);
+			escribe();
+		}
+
+		escribe("a < 5?: ");
+		escribeEnt(a);
+		escribe();	
+		b = b + 1;
+		a++;
 	}
 
-}
-
-
-devuelve;
+	/* bloque */
+	{
+		entero c;
+		{
+			c=1;
+			escribe("c = 1 ?:");
+			escribeEnt(c);
+			escribe();
+		}
+	}
+	devuelve;
 
 }
