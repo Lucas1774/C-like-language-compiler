@@ -882,7 +882,7 @@ parametros ::= expresion:e {:
 //  SENTENCIAS
 
 bloque ::= OPEN_PARENTHESIS {:
-	scopeManager.openScope("void");
+	scopeManager.openScope();
 :} bloque1: f {:
 	RESULT = f;
 :};
