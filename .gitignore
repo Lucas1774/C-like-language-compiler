@@ -1,7 +1,6 @@
 Directrices.pdf
 Enunciado.pdf
 GAMBOA
-ENS2001
 Entrega1.rar
 FAQ_Analisis_Lexico.pdf
 FAQ_Analisis_Sintactico.pdf
@@ -12,3 +11,5 @@ Herramientas
 ArquitecturaPLII2022_2023_v2/classes
 ArquitecturaPLII2022_2023_v2/doc/memoria
 .vscode
+ENS2001/*
+!eNS2001/winens.exe

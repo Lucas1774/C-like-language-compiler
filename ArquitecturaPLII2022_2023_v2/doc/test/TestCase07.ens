@@ -435,6 +435,9 @@ L_38: NOP
 ;Quadruple - [WRITESTRING T_40, L_40, null]
 WRSTR /L_40
 
+;Quadruple - [WRITEEMPTY null, null, null]
+WRCHAR #10
+
 ;Quadruple - [INL L_43, null, null]
 L_43: NOP
 
@@ -510,89 +513,95 @@ WRINT /54
 ;Quadruple - [WRITEEMPTY null, null, null]
 WRCHAR #10
 
-;Quadruple - [MV T_52, 2, null]
-MOVE #2, /55
-
-;Quadruple - [MVA T_53, dia, null]
-MOVE #2, /56
-
-;Quadruple - [STP T_53, T_52, null]
-MOVE /56, .R1
-MOVE /55, [.R1]
-
-;Quadruple - [MV T_54, dia, null]
-MOVE /2, /57
-
-;Quadruple - [SUB T_55, T_54, 1]
-SUB /57, #1
-MOVE .A , /58
-
-;Quadruple - [BNZ L_51, T_55, null]
-CMP /58, #0
-BNZ /L_51
-
-;Quadruple - [WRITESTRING T_0, L_46, null]
+;Quadruple - [WRITESTRING T_52, L_46, null]
 WRSTR /L_46
 
-;Quadruple - [BR L_50, null, null]
-BR /L_50
+;Quadruple - [WRITEEMPTY null, null, null]
+WRCHAR #10
 
-;Quadruple - [INL L_51, null, null]
-L_51: NOP
+;Quadruple - [MV T_53, 2, null]
+MOVE #2, /56
 
-;Quadruple - [SUB T_55, T_54, 2]
-SUB /57, #2
-MOVE .A , /58
+;Quadruple - [MVA T_54, dia, null]
+MOVE #2, /57
 
-;Quadruple - [BNZ L_52, T_55, null]
-CMP /58, #0
+;Quadruple - [STP T_54, T_53, null]
+MOVE /57, .R1
+MOVE /56, [.R1]
+
+;Quadruple - [MV T_55, dia, null]
+MOVE /2, /58
+
+;Quadruple - [SUB T_56, T_55, 1]
+SUB /58, #1
+MOVE .A , /59
+
+;Quadruple - [BNZ L_52, T_56, null]
+CMP /59, #0
 BNZ /L_52
 
 ;Quadruple - [WRITESTRING T_0, L_47, null]
 WRSTR /L_47
 
-;Quadruple - [BR L_50, null, null]
-BR /L_50
+;Quadruple - [BR L_51, null, null]
+BR /L_51
 
 ;Quadruple - [INL L_52, null, null]
 L_52: NOP
 
-;Quadruple - [SUB T_55, T_54, 3]
-SUB /57, #3
-MOVE .A , /58
+;Quadruple - [SUB T_56, T_55, 2]
+SUB /58, #2
+MOVE .A , /59
 
-;Quadruple - [BNZ L_53, T_55, null]
-CMP /58, #0
+;Quadruple - [BNZ L_53, T_56, null]
+CMP /59, #0
 BNZ /L_53
 
 ;Quadruple - [WRITESTRING T_0, L_48, null]
 WRSTR /L_48
 
-;Quadruple - [BR L_50, null, null]
-BR /L_50
+;Quadruple - [BR L_51, null, null]
+BR /L_51
 
 ;Quadruple - [INL L_53, null, null]
 L_53: NOP
 
-;Quadruple - [SUB T_55, T_54, 4]
-SUB /57, #4
-MOVE .A , /58
+;Quadruple - [SUB T_56, T_55, 3]
+SUB /58, #3
+MOVE .A , /59
 
-;Quadruple - [BNZ L_54, T_55, null]
-CMP /58, #0
+;Quadruple - [BNZ L_54, T_56, null]
+CMP /59, #0
 BNZ /L_54
 
 ;Quadruple - [WRITESTRING T_0, L_49, null]
 WRSTR /L_49
 
-;Quadruple - [BR L_50, null, null]
-BR /L_50
+;Quadruple - [BR L_51, null, null]
+BR /L_51
 
 ;Quadruple - [INL L_54, null, null]
 L_54: NOP
 
-;Quadruple - [INL L_50, null, null]
-L_50: NOP
+;Quadruple - [SUB T_56, T_55, 4]
+SUB /58, #4
+MOVE .A , /59
+
+;Quadruple - [BNZ L_55, T_56, null]
+CMP /59, #0
+BNZ /L_55
+
+;Quadruple - [WRITESTRING T_0, L_50, null]
+WRSTR /L_50
+
+;Quadruple - [BR L_51, null, null]
+BR /L_51
+
+;Quadruple - [INL L_55, null, null]
+L_55: NOP
+
+;Quadruple - [INL L_51, null, null]
+L_51: NOP
 
 ;Quadruple - [HALT null, null, null]
 HALT
@@ -651,15 +660,18 @@ L_40: DATA " mientras"
 ;Quadruple - [CADENA "a = 5?: ", L_45, null]
 L_45: DATA "a = 5?: "
 
-;Quadruple - [CADENA "lunes", L_46, null]
-L_46: DATA "lunes"
+;Quadruple - [CADENA " alternativas", L_46, null]
+L_46: DATA " alternativas"
 
-;Quadruple - [CADENA "martes", L_47, null]
-L_47: DATA "martes"
+;Quadruple - [CADENA "lunes", L_47, null]
+L_47: DATA "lunes"
 
-;Quadruple - [CADENA "miercoles", L_48, null]
-L_48: DATA "miercoles"
+;Quadruple - [CADENA "martes", L_48, null]
+L_48: DATA "martes"
 
-;Quadruple - [CADENA "error", L_49, null]
-L_49: DATA "error"
+;Quadruple - [CADENA "miercoles", L_49, null]
+L_49: DATA "miercoles"
+
+;Quadruple - [CADENA "error", L_50, null]
+L_50: DATA "error"
 
