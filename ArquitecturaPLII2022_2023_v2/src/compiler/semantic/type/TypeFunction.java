@@ -6,7 +6,7 @@ import es.uned.lsi.compiler.semantic.ScopeIF;
  * Class for TypeFunction.
  */
 
-// TODO: Student work
+// Student work
 //       Include properties to characterize function declarations
 
 public class TypeFunction
@@ -39,7 +39,7 @@ public class TypeFunction
     @Override
     public int getSize ()
     {
-        // TODO: Student work
+        // Student work
         return 1;
     }
 }

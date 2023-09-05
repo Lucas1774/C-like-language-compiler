@@ -9,23 +9,32 @@ entero b;
 entero c;
 
 a=6;
+escribe("a = 6?: ");
+escribeEnt(a);
+escribe();
+
 b=3;
+escribe("b = 3?: ");
+escribeEnt(b);
+escribe();
+
 c= a+b;
 
-escribe("c es 9");
+escribe("c = 9?: ");
 escribeEnt(c);
+escribe();
 
 
 c++;
-
-escribe("c es 10");
+escribe("c = 10?: ");
 escribeEnt(c);
+escribe();
 
 
 c+=1;
-
-escribe("c es 11");
+escribe("c = 11?: ");
 escribeEnt(c);
+escribe();
 
 
 

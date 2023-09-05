@@ -1,0 +1,9 @@
+;Quadruple - [WRITESTRING T_0, L_0, null]
+WRSTR /L_0
+
+;Quadruple - [HALT null, null, null]
+HALT
+
+;Quadruple - [CADENA "imprime", L_0, null]
+L_0: DATA "imprime"
+

@@ -7,13 +7,13 @@ import es.uned.lsi.compiler.semantic.type.TypeBase;
  * Class for TypeArray.
  */
 
-// TODO: Student work
+// Student work
 //       Include properties to characterize array type
 
 public class TypeArray
     extends TypeBase
 {   
-    
+    private int length;
 	/**
      * Constructor for TypeArray.
      * @param scope The declaration scope.
@@ -23,16 +23,15 @@ public class TypeArray
         super (scope);
     }
 
-    /**
-     * Constructor for TypeArray.
-     * @param scope The declaration scope.
-     * @param name The name of the type.
-     */
-    public TypeArray (ScopeIF scope, String name)
+    public TypeArray (ScopeIF scope, String name, int length)
     {
         super (scope, name);
+        this.length = length;
     }
-    
+
+    public int getLength(){
+        return this.length;
+    }
     /**
      * Returns the size of the type.
      * @return the size of the type.
@@ -40,7 +39,6 @@ public class TypeArray
     @Override
     public int getSize ()
     {
-        // TODO: Student work
-        return 1;
+        return this.length;
     }
 }

@@ -1,7 +1,7 @@
 
 /* 
 
-// Flujo , operadores relacionales y lógicos (si mientras)
+// Flujo , operadores relacionales y lï¿½gicos (si mientras)
 
 */
 
@@ -9,36 +9,118 @@
 
 vacio principal () {
 
+	entero a;
+	entero b;
+	entero dia;
 
-entero a;
-entero b;
-entero dia;
+	a=2;
+	escribe("a = 2?: ");
+	escribeEnt(a);
+	escribe();
 
-a=2;
-b=2;
+	b=1;
+	escribe("b = 1?: ");
+	escribeEnt(b);
+	escribe();
 
-si (a==b) {
+	si (a==b) {
 
-	escribe("si bien");
-}
-sino {
+		escribe("error");
+		escribe();
+	}
+	sino {
 
-	escribe("si mal");
+		escribe("a desigual a b");
+		escribe();
 
-}
+	}
+	si (a<b) {
 
+		escribe("error");
+		escribe();
+	}
+	sino {
 
-escribe(" mientras");
-mientras (a<5)	a=a+1;
+		escribe("a mayor o igual que b");
+		escribe();
 
-escribe (" alternativas");
+	}
 
-dia = 2;
-alternativas (dia) {
+	b++;
+	escribe("b = 2?: ");
+	escribeEnt(b);
+	escribe();
 
-	caso 1: {escribe ("lunes");} corte;
-	caso 2: {escribe ("martes");} corte;	
-}
+	si (a==b) {
+
+		escribe("a igual a b");
+		escribe();
+	}
+	sino {
+
+		escribe("error");
+		escribe();
+
+	}
+	si (a<b) {
+
+		escribe("error");
+		escribe();
+	}
+	sino {
+
+		escribe("a mayor o igual que b");
+		escribe();
+
+	}
+
+	b+=1;
+	escribe("b = 3?: ");
+	escribeEnt(b);
+	escribe();
+
+	si (a==b) {
+
+		escribe("error");
+		escribe();
+	}
+	sino {
+
+		escribe("a desigual a b");
+		escribe();
+
+	}
+	si (a<b) {
+
+		escribe("a menor que b");
+		escribe();
+	}
+	sino {
+
+		escribe("error");
+		escribe();
+
+	}
+
+	escribe(" mientras");
+	escribe();
+	mientras (a<5)
+		a=a+1;
+
+	escribe("a = 5?: ");
+	escribeEnt(a);
+	escribe();
+
+	escribe(" alternativas");
+	escribe();
+	dia = 2;
+	alternativas (dia) {
+
+		caso 1: {escribe ("lunes");} corte;
+		caso 2: {escribe ("martes");} corte;
+		caso 3: {escribe ("miercoles");} corte;	
+		caso 4: {escribe ("error");} corte;
+	}
 
 
 devuelve;

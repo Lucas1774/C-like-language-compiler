@@ -1,0 +1,19 @@
+entero x, y;
+
+vacio principal () {
+    entero z = 1;
+    si (z == 1) {
+        escribe ("correcto");
+    }
+    si (!(z == 1)) {
+        escribe("error");
+    }
+
+    si (z == 1) {
+        escribe ("correcto");
+    }
+    sino {
+        escribe("error");
+    }
+    devuelve;
+}
