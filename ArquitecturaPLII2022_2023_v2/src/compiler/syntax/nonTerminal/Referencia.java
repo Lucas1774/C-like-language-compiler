@@ -4,12 +4,10 @@ package compiler.syntax.nonTerminal;
 public class Referencia extends NonTerminal{
     String name;
     String type;
-    int index;
 
-    public Referencia(String name, String type, int index) {
+    public Referencia(String name, String type) {
         this.name = name;
         this.type = type;
-        this.index = index;
     }
 
     public String getName() {
@@ -18,9 +16,5 @@ public class Referencia extends NonTerminal{
 
     public String getType() {
         return this.type;
-    }
-
-    public int getIndex() {
-        return this.index;
     }
 }

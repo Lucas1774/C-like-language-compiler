@@ -45,9 +45,9 @@ action code {:
 
 	public TypeIF checkIfExistsTypeWithinOpenScopes (Token token, boolean iWantIt){
 		if (iWantIt && !scopeManager.containsType(token.getLexema())){
-			semanticErrorManager.semanticFatalError("Linea " + token.getLine() + " Columna " + token.getColumn() + " identificador " + token.getLexema() + " no declarado");
+			semanticErrorManager.semanticFatalError("Linea " + token.getLine() + " Columna " + token.getColumn() + " tipo " + token.getLexema() + " no declarado");
 		} else if (!iWantIt && scopeManager.containsType(token.getLexema())){
-			semanticErrorManager.semanticFatalError("Linea " + token.getLine() + " Columna " + token.getColumn() + " identificador " + token.getLexema() + " ya declarado");
+			semanticErrorManager.semanticFatalError("Linea " + token.getLine() + " Columna " + token.getColumn() + " tipo " + token.getLexema() + " ya declarado");
 		} else if (iWantIt && scopeManager.containsType(token.getLexema())){
 			return scopeManager.searchType(token.getLexema());
 		}
@@ -534,10 +534,12 @@ declaracionParametros ::= parametro:param {:
 	:};
 
 parametro ::= ENTERO IDENTIFICADOR:name {:
+	checkIfExistsSymbolWithinOpenScopes(name, false);
 	Parametro param = new Parametro(scopeManager.searchType("entero"), name.getLexema());
 	RESULT = param;
 :}
 	| IDENTIFICADOR:identifier IDENTIFICADOR:name {:
+		checkIfExistsSymbolWithinOpenScopes(name, false);
 		TypeIF type = checkIfExistsTypeWithinOpenScopes(identifier, true);
 		Parametro param = new Parametro(type, name.getLexema());
 		RESULT = param;
@@ -785,7 +787,7 @@ expresion ::= NUMERO:n {:
 											TemporalFactory tf = new TemporalFactory(scopeManager.getCurrentScope());
 											IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeManager.getCurrentScope());
 											TemporalIF temp = tf.create();
-											Expresion e = new Expresion(scopeManager.searchType("entero"), "variable", a.getValue());
+											Expresion e = new Expresion(scopeManager.searchType("entero"), "variable", null);
 											cb.addQuadruples(a.getIntermediateCode());
 											cb.addQuadruple("MVP", temp, a.getTemporal()); // move to temp value pointed by index
 											e.setTemporal(temp);
@@ -818,7 +820,7 @@ accesoVector ::= IDENTIFICADOR:id OPEN_BRACKET expresion:a  CLOSE_BRACKET {:
 	TemporalIF temp = tf.create();
 	TemporalIF temporalForMemoryID = tf.create();
 	TemporalIF temporalForMemoryIDWithDesplazamiento = tf.create();
-	AccesoVector accesoVector = new AccesoVector (id.getLexema(), (int)a.getValue());
+	AccesoVector accesoVector = new AccesoVector (id.getLexema());
 	Variable var = new Variable(id.getLexema(), scopeManager.searchSymbol(id.getLexema()).getScope());
 	cb.addQuadruples(a.getIntermediateCode());
 	cb.addQuadruple("MVA", temporalForMemoryID, var); // move value of pointer
@@ -992,7 +994,7 @@ sentenciaAsignacion ::= ref:reference ASSIGN:a expresion:e SEMI_COLON {:
 		cb.addQuadruple("STP", temp, e.getTemporal());
 	}
 	sentencia.setIntermediateCode(cb.create());
-	semanticErrorManager.semanticDebug("Codigo intermedio asignacion " + reference.getName() + "[" + reference.getIndex() + "]" + " = " + e.getValue() +": " + sentencia.getIntermediateCode());
+	semanticErrorManager.semanticDebug("Codigo intermedio asignacion " + reference.getName() + "[" + reference.getTemporal() + "]" + " = " + e.getValue() +": " + sentencia.getIntermediateCode());
 	RESULT = sentencia;
 :};
 
@@ -1011,7 +1013,7 @@ sentenciaAsignacionSuma ::= ref:reference ASSIGN_SUMA:a expresion:e SEMI_COLON {
 		cb.addQuadruples(reference.getIntermediateCode());
 		cb.addQuadruple("MVP", tempValueOfVar, reference.getTemporal()); //value of var = value of index of var
 		cb.addQuadruple("ADD", tempSuma, e.getTemporal(), tempValueOfVar); // tempSuma = value of expresion + value of var
-		cb.addQuadruple("STP", temp, tempSuma); // index of var = tempSuma
+		cb.addQuadruple("STP", reference.getTemporal(), tempSuma); // index of var = tempSuma
 	} else{
 		Variable var = new Variable(reference.getName(), scopeManager.searchSymbol(reference.getName()).getScope());;
 		cb.addQuadruple("MVA", temp, var); // temp = index of var
@@ -1020,7 +1022,7 @@ sentenciaAsignacionSuma ::= ref:reference ASSIGN_SUMA:a expresion:e SEMI_COLON {
 		cb.addQuadruple("STP", temp, tempSuma); // index of var = tempSuma
 	}
 	sentencia.setIntermediateCode(cb.create());
-	semanticErrorManager.semanticDebug("Codigo intermedio asignacion " + reference.getName() + "[" + reference.getIndex() + "]" + " = " + e.getValue() +": " + sentencia.getIntermediateCode());
+	semanticErrorManager.semanticDebug("Codigo intermedio asignacionSuma " + reference.getName() + "[" + reference.getTemporal() + "]" + " = " + e.getValue() +": " + sentencia.getIntermediateCode());
 	RESULT = sentencia;
 :};
 
@@ -1029,11 +1031,11 @@ ref ::= IDENTIFICADOR:id {:
 	if (!mySymbol.getType().getName().equals("entero")){
 		semanticErrorManager.semanticFatalError("Linea " + id.getLine() + " el objeto " + id.getLexema() + " no es de tipo entero");
 	}
-	Referencia r = new Referencia(mySymbol.getName(), "IDENTIFICADOR", 0);
+	Referencia r = new Referencia(mySymbol.getName(), "IDENTIFICADOR");
 	RESULT = r;
 :}
 	| accesoVector:a {:
-		Referencia r = new Referencia(a.getName() , "ACCESO_VECTOR", a.getValue());
+		Referencia r = new Referencia(a.getName() , "ACCESO_VECTOR");
 		r.setIntermediateCode(a.getIntermediateCode());
 		r.setTemporal(a.getTemporal());
 		RESULT = r;
