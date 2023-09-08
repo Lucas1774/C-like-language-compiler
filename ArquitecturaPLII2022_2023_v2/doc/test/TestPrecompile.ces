@@ -1,0 +1,75 @@
+/* only one of these should be uncommented at a time, each is a unit test. */
+/* non of them should get trough the compiling process unless said otherwise. */
+
+tipo entero vector[3];
+
+entero a = 0;
+
+/* parameter identifier already declared */
+/* entero sum1 (entero a, vector v){
+    devuelve a;
+} */
+
+entero sum (entero c, vector v) {
+    
+    vector v2;
+    /* type already declared */
+    /* tipo entero vector[3]; */
+
+    /* type not declared */
+    /* otroTipoDeVector v2; */
+
+    /* identifier already declared */
+    /* entero a; */
+
+    /*identifier already declared but in other scope (should be compiled) */
+    si (1) {
+        entero b = 0;
+        escribe();
+    } sino {
+        entero b = 0;
+        escribe();
+    }
+
+    c = a ++;
+
+    /* return type */
+    /* devuelve; */ /* void not compatible */
+    /* devuelve v2; */ /* array not compatible */
+    /* doesn't exist return (comment next line to test) */
+    devuelve c;
+}
+
+vacio nada() {
+    devuelve;
+}
+
+vacio principal () {
+
+    vector v;
+
+    /* invalid expresion */
+    /* a = v + 2; */ /* expresion is not valid */
+    /* a = nada(); */ /* void not compatible */ 
+    a = sum (a, v); /* int (should be compiled) */
+
+    /* vector access as expresion */
+    /* a = v[v]; */ /* array as index not compatible */
+    /* a = v[4]; */ /* index out of bounds */
+    a = v[2]; /* index in bounds (should be compiled) */
+
+    /* vector access as reference */
+    /* v = a; */ /* unindexed vector isn't valid reference */
+    /* v[v] = a; */ /* array as index not compatible */
+    /* v[4] = a; */ /* index out of bounds */
+    v[a] = 2; /* index is an int (should be compiled) */
+
+    /* method invocation */
+    /* a(); */ /* is not a method */
+    /* sum(a); */ /* wrong ammount of params */
+    /* sum(a, a); */ /* wrong type of params */
+    /* sum(v, a); */ /* wrong order of params */
+    sum(a, v); /* everything right (should be compiled) */
+
+    devuelve;
+}
