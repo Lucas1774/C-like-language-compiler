@@ -10,11 +10,13 @@ vacio principal () {
 tipo entero vector[3];
 
 vector v1;
-entero c;
+entero a = 1, b = 7, c;
 
-v1[1] = 7;
+v1[a] = b;
 
 escribe("v1[1] = 7 ?:");
+escribeEnt(v1[a]);
+escribe();
 escribeEnt(v1[1]);
 escribe();
 
@@ -34,12 +36,15 @@ escribe("v1[v1[2]] = 3 ?:");
 escribeEnt(v1[v1[2]]);
 escribe();
 
-c = v1[1] + v1[v1[2]];
-
-escribeEnt(c);
+c = v1[a] + v1[v1[2]];
 
 escribe("c = 10 ?: ");
 escribeEnt(c);
+escribe();
+
+v1[1] += v1[0] + 1;
+escribe("v1[1] = 11 ?:");
+escribeEnt(v1[1]);
 escribe();
 
 devuelve;
